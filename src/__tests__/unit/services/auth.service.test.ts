@@ -1,4 +1,3 @@
-import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../config/database';
 import { User } from '../../../entities/User';
 import { loginUser } from '../../../services/auth.service';
@@ -15,7 +14,7 @@ jest.mock('../../../config/database', () => ({
 }));
 
 describe('Auth Service', () => {
-  let userRepositoryMock: Repository<User>;
+  let userRepositoryMock: any;
   let mockUser: User;
 
   beforeEach(async () => {
