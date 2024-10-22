@@ -1,11 +1,12 @@
-import { AppDataSource } from '@config/database';
-import { User } from '@entities/User';
-import { loginUser } from '@services/auth.service';
+import { Repository } from 'typeorm';
+import { AppDataSource } from '../../../config/database';
+import { User } from '../../../entities/User';
+import { loginUser } from '../../../services/auth.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 // Mock the database connection
-jest.mock('../../config/database', () => ({
+jest.mock('../../../config/database', () => ({
   AppDataSource: {
     getRepository: jest.fn().mockReturnValue({
       findOne: jest.fn(),
@@ -14,7 +15,7 @@ jest.mock('../../config/database', () => ({
 }));
 
 describe('Auth Service', () => {
-  let userRepositoryMock: any;
+  let userRepositoryMock: Repository<User>;
   let mockUser: User;
 
   beforeEach(async () => {
@@ -57,4 +58,3 @@ describe('Auth Service', () => {
     expect(decoded).toHaveProperty('id', 1);
   });
 });
-
