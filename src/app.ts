@@ -1,5 +1,6 @@
 import express from 'express';
 import { AppDataSource } from './config/database';
+import authRoutes from './routes/auth.routes';
 
 const app = express();
 
@@ -19,6 +20,8 @@ AppDataSource.initialize()
 app.get('/', (req, res) => {
   res.send('Welcome to BookSocial API!');
 });
+
+app.use('/auth', authRoutes);
 
 // TODO: Error handling middleware
 // app.use(futureErrorHandler)
