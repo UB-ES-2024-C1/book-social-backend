@@ -20,3 +20,32 @@ export const loginUser = async (
   });
   return token;
 };
+
+export const registerUser = async (
+  firstName: string,
+  lastName: string,
+  username: string,
+  email: string,
+  password: string
+): Promise<User | null> => {
+  // Verificar si el usuario ya existe
+  const existingUser = await userRepository.findOne({
+    where: [{ email }, { username }],
+  });
+  if (existingUser) return null;
+
+  // Crear nuevo usuario
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = userRepository.create({
+    firstName,
+    lastName,
+    username,
+    email,
+    password: hashedPassword,
+  });
+
+  // Guardar el nuevo usuario en la base de datos
+  await userRepository.save(newUser);
+
+  return newUser;
+};
