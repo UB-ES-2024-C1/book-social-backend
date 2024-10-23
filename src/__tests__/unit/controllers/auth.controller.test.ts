@@ -64,7 +64,7 @@ describe('Auth Controller', () => {
 
   it('should return 400 for invalid email format', async () => {
     req.body = { email: 'invalidemail', password: 'ValidPass1!' };
-    
+
     await login(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(400);
@@ -73,16 +73,19 @@ describe('Auth Controller', () => {
 
   it('should return 400 for invalid password format', async () => {
     req.body = { email: 'john.doe@example.com', password: 'short' };
-    
+
     await login(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters' });
+    expect(res.json).toHaveBeenCalledWith({
+      message:
+        'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters',
+    });
   });
 
   it('should return 400 for both invalid email and password', async () => {
     req.body = { email: 'invalidemail', password: 'short' };
-    
+
     await login(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(400);
