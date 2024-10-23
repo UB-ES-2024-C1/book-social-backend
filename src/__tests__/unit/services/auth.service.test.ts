@@ -1,6 +1,6 @@
 import { AppDataSource } from '../../../config/database';
 import { User } from '../../../entities/User';
-import { loginUser } from '../../../services/auth.service';
+import { loginUser, registerUser } from '../../../services/auth.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -9,6 +9,8 @@ jest.mock('../../../config/database', () => ({
   AppDataSource: {
     getRepository: jest.fn().mockReturnValue({
       findOne: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
     }),
   },
 }));
@@ -55,5 +57,22 @@ describe('Auth Service', () => {
 
     const decoded = jwt.verify(result as string, process.env.JWT_SECRET);
     expect(decoded).toHaveProperty('id', 1);
+  });
+
+  it('should return null for existing user during registration', async () => {
+    userRepositoryMock.findOne.mockResolvedValue(mockUser);
+
+    const result = await registerUser('John', 'Doe', 'johndoe', 'john@example.com', 'password123');
+    expect(result).toBeNull();
+  });
+
+  it('should create and return a new user for valid registration data', async () => {
+    userRepositoryMock.findOne.mockResolvedValue(null); // No existing user
+    userRepositoryMock.create.mockReturnValue(mockUser);
+    userRepositoryMock.save.mockResolvedValue(mockUser);
+
+    const result = await registerUser('John', 'Doe', 'johndoe', 'john@example.com', 'password123');
+    expect(result).toEqual(mockUser);
+    expect(result).toHaveProperty('id', 1);
   });
 });
