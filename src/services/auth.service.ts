@@ -27,12 +27,22 @@ export const registerUser = async (
   username: string,
   email: string,
   password: string
-): Promise<User | null> => {
-  // Verificar si el usuario ya existe
-  const existingUser = await userRepository.findOne({
-    where: [{ email }, { username }],
+): Promise<{ user: User | null; error?: string }> => {
+  // Verificar si existe un usuario con el mismo email
+  const existingEmail = await userRepository.findOne({
+    where: { email },
   });
-  if (existingUser) return null;
+  if (existingEmail) {
+    return { user: null, error: 'Email already exists' };
+  }
+
+  // Verificar si existe un usuario con el mismo username
+  const existingUsername = await userRepository.findOne({
+    where: { username },
+  });
+  if (existingUsername) {
+    return { user: null, error: 'Username already exists' };
+  }
 
   // Crear nuevo usuario
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -47,5 +57,5 @@ export const registerUser = async (
   // Guardar el nuevo usuario en la base de datos
   await userRepository.save(newUser);
 
-  return newUser;
+  return { user: newUser };
 };

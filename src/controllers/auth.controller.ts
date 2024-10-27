@@ -28,7 +28,12 @@ export const register = async (
   try {
     const { firstName, lastName, username, email, password } = req.body;
 
-    const newUser = await registerUser(
+    if (!firstName || !lastName || !username || !email || !password) {
+      res.status(400).json({ message: 'Missing required fields' });
+      return;
+    }
+
+    const result = await registerUser(
       firstName,
       lastName,
       username,
@@ -36,18 +41,16 @@ export const register = async (
       password
     );
 
-    if (!newUser) {
-      res.status(400).json({ message: 'Error registering user' });
+    if (!result.user) {
+      res.status(400).json({ message: result.error });
       return;
     }
 
     res.status(201).json({
       message: 'User registered successfully',
-      userId: newUser?.id,
+      userId: result.user.id,
     });
   } catch (error) {
-    // TODO: Handle error with a middleware instead of returning 500 response
-    // next(error);
     res.status(500).json({ message: 'Error registering user', error });
   }
 };

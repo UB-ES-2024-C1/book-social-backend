@@ -82,12 +82,58 @@ describe('Auth Controller - Register', () => {
   });
 
   it('should return 400 for invalid registration data', async () => {
-    req.body = {}; // No data provided
+    req.body = {};
 
     await register(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Error registering user' });
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Missing required fields',
+    });
+  });
+
+  it('should return 400 if email already exists', async () => {
+    req.body = {
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'existing@example.com',
+      password: 'password123',
+    };
+
+    (registerUser as jest.Mock).mockResolvedValue({
+      user: null,
+      error: 'Email already exists',
+    });
+
+    await register(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Email already exists',
+    });
+  });
+
+  it('should return 400 if username already exists', async () => {
+    req.body = {
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'existinguser',
+      email: 'new@example.com',
+      password: 'password123',
+    };
+
+    (registerUser as jest.Mock).mockResolvedValue({
+      user: null,
+      error: 'Username already exists',
+    });
+
+    await register(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Username already exists',
+    });
   });
 
   it('should return 201 and userId for successful registration', async () => {
@@ -98,8 +144,11 @@ describe('Auth Controller - Register', () => {
       email: 'john@example.com',
       password: 'password123',
     };
+
     const mockUser = { id: 1 };
-    (registerUser as jest.Mock).mockResolvedValue(mockUser);
+    (registerUser as jest.Mock).mockResolvedValue({
+      user: mockUser,
+    });
 
     await register(req, res, next);
 
@@ -108,22 +157,6 @@ describe('Auth Controller - Register', () => {
       message: 'User registered successfully',
       userId: mockUser.id,
     });
-  });
-
-  it('should return 400 if user already exists', async () => {
-    req.body = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'johndoe',
-      email: 'john@example.com',
-      password: 'password123',
-    };
-    (registerUser as jest.Mock).mockResolvedValue(null);
-
-    await register(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Error registering user' });
   });
 
   it('should call next with error on exception', async () => {
