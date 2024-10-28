@@ -4,7 +4,7 @@ import { validateLoginInput, validateRegisterInput } from '../utils/validation';
 
 /**
  * Handles user login.
- * 
+ *
  * @param req - The Express request object.
  * @param res - The Express response object.
  * @param next - The Express next function.
@@ -19,15 +19,17 @@ export const login = async (
     const validation = validateLoginInput(email, password);
 
     if (!validation.isValid) {
-      return res.status(400).json({
+      res.status(400).json({
         message: 'Validation failed',
         errors: validation.errors,
       });
+      return;
     }
 
     const token = await loginUser(email, password);
     if (!token) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      res.status(401).json({ message: 'Invalid credentials' });
+      return;
     }
 
     res.status(200).json({ token });
@@ -38,7 +40,7 @@ export const login = async (
 
 /**
  * Handles user registration.
- * 
+ *
  * @param req - The Express request object.
  * @param res - The Express response object.
  * @param next - The Express next function.
@@ -60,10 +62,11 @@ export const register = async (
     );
 
     if (!validation.isValid) {
-      return res.status(400).json({
+      res.status(400).json({
         message: 'Validation failed',
         errors: validation.errors,
       });
+      return;
     }
 
     const result = await registerUser(
@@ -75,7 +78,8 @@ export const register = async (
     );
 
     if (!result.user) {
-      return res.status(400).json({ message: result.error });
+      res.status(400).json({ message: result.error });
+      return;
     }
 
     res.status(201).json({
