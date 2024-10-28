@@ -28,7 +28,7 @@ describe('Auth Service', () => {
       lastName: 'Doe',
       username: 'johndoe',
       email: 'john@example.com',
-      password: await bcrypt.hash('correctpassword', 10),
+      password: await bcrypt.hash('ValidPass1!', 10),
     } as User;
 
     userRepositoryMock = AppDataSource.getRepository(User);
@@ -53,7 +53,7 @@ describe('Auth Service', () => {
     userRepositoryMock.findOne.mockResolvedValue(mockUser);
 
     process.env.JWT_SECRET = 'testsecret';
-    const result = await loginUser('john@example.com', 'correctpassword');
+    const result = await loginUser('john@example.com', 'ValidPass1!');
     expect(result).toBeTruthy();
     expect(typeof result).toBe('string');
 
@@ -72,7 +72,7 @@ describe('Auth Service', () => {
         'Doe',
         'newusername',
         'john@example.com',
-        'password123'
+        'ValidPass1!'
       );
 
       expect(result).toEqual({
@@ -82,25 +82,23 @@ describe('Auth Service', () => {
     });
 
     it('should return error when username already exists', async () => {
-      const findOneMock = userRepositoryMock.findOne;
-
-      findOneMock
-        .mockImplementationOnce(() => Promise.resolve(null)) // Primera llamada (email check)
-        .mockImplementationOnce(() => Promise.resolve(mockUser)); // Segunda llamada (username check)
+      userRepositoryMock.findOne
+        .mockResolvedValueOnce(null) // Email check
+        .mockResolvedValueOnce(mockUser); // Username check
 
       const result = await registerUser(
         'John',
         'Doe',
         'johndoe',
         'newemail@example.com',
-        'password123'
+        'ValidPass1!'
       );
 
-      expect(findOneMock).toHaveBeenCalledTimes(2);
-      expect(findOneMock).toHaveBeenNthCalledWith(1, {
+      expect(userRepositoryMock.findOne).toHaveBeenCalledTimes(2);
+      expect(userRepositoryMock.findOne).toHaveBeenNthCalledWith(1, {
         where: { email: 'newemail@example.com' },
       });
-      expect(findOneMock).toHaveBeenNthCalledWith(2, {
+      expect(userRepositoryMock.findOne).toHaveBeenNthCalledWith(2, {
         where: { username: 'johndoe' },
       });
 
@@ -114,7 +112,6 @@ describe('Auth Service', () => {
       userRepositoryMock.findOne
         .mockResolvedValueOnce(null) // Email check
         .mockResolvedValueOnce(null); // Username check
-      userRepositoryMock.create.mockReturnValue(mockUser);
       userRepositoryMock.save.mockResolvedValue(mockUser);
 
       const result = await registerUser(
@@ -122,13 +119,29 @@ describe('Auth Service', () => {
         'Doe',
         'johndoe',
         'john@example.com',
-        'password123'
+        'ValidPass1!'
       );
 
       expect(result).toEqual({
         user: mockUser,
       });
       expect(result.user).toHaveProperty('id', 1);
+    });
+
+    // Add new test for password validation
+    it('should return error for invalid password format', async () => {
+      const result = await registerUser(
+        'John',
+        'Doe',
+        'johndoe',
+        'john@example.com',
+        'weakpass'
+      );
+
+      expect(result).toEqual({
+        user: null,
+        error: expect.stringContaining('Password must contain'),
+      });
     });
   });
 });

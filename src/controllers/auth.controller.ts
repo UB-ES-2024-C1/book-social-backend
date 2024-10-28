@@ -1,7 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { loginUser, registerUser } from '../services/auth.service';
-import { validateUserEmail, validateUserPassword } from '../utils/validation';
+import { validateLoginInput, validateRegisterInput } from '../utils/validation';
 
+/**
+ * Handles user login.
+ *
+ * @param req - The Express request object.
+ * @param res - The Express response object.
+ * @param next - The Express next function.
+ */
 export const login = async (
   req: Request,
   res: Response,
@@ -9,11 +16,13 @@ export const login = async (
 ) => {
   try {
     const { email, password } = req.body;
-    const emailError = validateUserEmail(email);
-    const passwordError = validateUserPassword(password);
+    const validation = validateLoginInput(email, password);
 
-    if (emailError || passwordError) {
-      res.status(400).json({ message: emailError || passwordError });
+    if (!validation.isValid) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: validation.errors,
+      });
       return;
     }
 
@@ -22,14 +31,20 @@ export const login = async (
       res.status(401).json({ message: 'Invalid credentials' });
       return;
     }
+
     res.status(200).json({ token });
   } catch (error) {
-    // TODO: Handle error con un middleware en vez de devolver la respuesta 500
-    // next(error);
     res.status(500).json({ message: 'Error logging in', error });
   }
 };
 
+/**
+ * Handles user registration.
+ *
+ * @param req - The Express request object.
+ * @param res - The Express response object.
+ * @param next - The Express next function.
+ */
 export const register = async (
   req: Request,
   res: Response,
@@ -38,8 +53,19 @@ export const register = async (
   try {
     const { firstName, lastName, username, email, password } = req.body;
 
-    if (!firstName || !lastName || !username || !email || !password) {
-      res.status(400).json({ message: 'Missing required fields' });
+    const validation = validateRegisterInput(
+      firstName,
+      lastName,
+      username,
+      email,
+      password
+    );
+
+    if (!validation.isValid) {
+      res.status(400).json({
+        message: 'Validation failed',
+        errors: validation.errors,
+      });
       return;
     }
 
