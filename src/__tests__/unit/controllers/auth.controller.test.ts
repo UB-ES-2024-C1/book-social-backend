@@ -70,7 +70,10 @@ describe('Auth Controller - Login', () => {
     await login(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Invalid email format' });
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Validation failed',
+      errors: ['Invalid email format'],
+    });
   });
 
   it('should return 400 for invalid password format', async () => {
@@ -80,8 +83,8 @@ describe('Auth Controller - Login', () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message:
-        'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters',
+      message: 'Validation failed',
+      errors: ['Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters'],
     });
   });
 
@@ -91,7 +94,13 @@ describe('Auth Controller - Login', () => {
     await login(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Invalid email format' }); // Prioritizes email error
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Validation failed',
+      errors: [
+        'Invalid email format',
+        'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters'
+      ]
+    });
   });
 });
 
@@ -118,7 +127,16 @@ describe('Auth Controller - Register', () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Missing required fields',
+      message: 'Validation failed',
+      errors: [
+        'First name is required',
+        'Last name is required',
+        'Username is required',
+        'Email is required',
+        'Password is required',
+        'Invalid email format',
+        'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters'
+      ]
     });
   });
 
@@ -128,7 +146,7 @@ describe('Auth Controller - Register', () => {
       lastName: 'Doe',
       username: 'johndoe',
       email: 'existing@example.com',
-      password: 'password123',
+      password: 'ValidPass1!',
     };
 
     (registerUser as jest.Mock).mockResolvedValue({
@@ -150,7 +168,7 @@ describe('Auth Controller - Register', () => {
       lastName: 'Doe',
       username: 'existinguser',
       email: 'new@example.com',
-      password: 'password123',
+      password: 'ValidPass1!',
     };
 
     (registerUser as jest.Mock).mockResolvedValue({
@@ -172,7 +190,7 @@ describe('Auth Controller - Register', () => {
       lastName: 'Doe',
       username: 'johndoe',
       email: 'john@example.com',
-      password: 'password123',
+      password: 'ValidPass1!',
     };
 
     const mockUser = { id: 1 };
@@ -195,7 +213,7 @@ describe('Auth Controller - Register', () => {
       lastName: 'Doe',
       username: 'johndoe',
       email: 'john@example.com',
-      password: 'password123',
+      password: 'ValidPass1!',
     };
     const mockError = new Error('Test error');
     (registerUser as jest.Mock).mockRejectedValue(mockError);
