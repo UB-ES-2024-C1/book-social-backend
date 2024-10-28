@@ -74,3 +74,93 @@ paths:
                   error:
                     type: object
                     description: Error details
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user
+      description: Register a new user in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstName
+                - lastName
+                - username
+                - email
+                - password
+              properties:
+                firstName:
+                  type: string
+                  example: "Pedro"
+                  description: User's first name
+                lastName:
+                  type: string
+                  example: "Picapiedra"
+                  description: User's last name
+                username:
+                  type: string
+                  example: "pedropicapiedra"
+                  description: User's unique username
+                email:
+                  type: string
+                  format: email
+                  example: "pedropicapiedra@example.com"
+                  description: User's email address
+                password:
+                  type: string
+                  format: password
+                  example: "ValidPass1!"
+                  description: User's password (min 8 chars, must include uppercase, lowercase, number and special char)
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token for authentication
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message describing the validation failure
+                    example: "Invalid email format"
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "User with this email already exists"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Error registering user"
+                  error:
+                    type: object
+                    description: Error details
