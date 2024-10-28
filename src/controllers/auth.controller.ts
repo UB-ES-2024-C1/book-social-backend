@@ -1,10 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { loginUser, registerUser } from '../services/auth.service';
-import {
-  validateLoginInput,
-  validateRegisterInput,
-} from '../utils/validation';
+import { validateLoginInput, validateRegisterInput } from '../utils/validation';
 
+/**
+ * Handles user login.
+ * 
+ * @param req - The Express request object.
+ * @param res - The Express response object.
+ * @param next - The Express next function.
+ */
 export const login = async (
   req: Request,
   res: Response,
@@ -32,6 +36,13 @@ export const login = async (
   }
 };
 
+/**
+ * Handles user registration.
+ * 
+ * @param req - The Express request object.
+ * @param res - The Express response object.
+ * @param next - The Express next function.
+ */
 export const register = async (
   req: Request,
   res: Response,

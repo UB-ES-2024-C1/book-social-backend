@@ -6,6 +6,13 @@ import { validate } from 'class-validator';
 
 const userRepository = AppDataSource.getRepository(User);
 
+/**
+ * Logs in a user and returns a JWT token if credentials are valid.
+ *
+ * @param email The email of the user.
+ * @param password The password of the user.
+ * @returns A Promise that resolves to a JWT token if the user is found and the password is valid, otherwise null.
+ */
 export const loginUser = async (
   email: string,
   password: string
@@ -22,6 +29,16 @@ export const loginUser = async (
   return token;
 };
 
+/**
+ * Registers a new user and saves them to the database.
+ *
+ * @param firstName The first name of the user.
+ * @param lastName The last name of the user.
+ * @param username The username of the user.
+ * @param email The email of the user.
+ * @param password The password of the user.
+ * @returns A Promise that resolves to an object containing the user if registration is successful, otherwise an error message.
+ */
 export const registerUser = async (
   firstName: string,
   lastName: string,
@@ -29,7 +46,6 @@ export const registerUser = async (
   email: string,
   password: string
 ): Promise<{ user: User | null; error?: string }> => {
-  // Create user instance
   const user = new User();
   Object.assign(user, {
     firstName,
@@ -39,7 +55,6 @@ export const registerUser = async (
     password,
   });
 
-  // Validate using class-validator
   const errors = await validate(user);
   if (errors.length > 0) {
     const validationErrors = errors
@@ -48,7 +63,6 @@ export const registerUser = async (
     return { user: null, error: validationErrors.join(', ') };
   }
 
-  // Check for existing email/username
   const existingEmail = await userRepository.findOne({
     where: { email },
   });
@@ -63,7 +77,6 @@ export const registerUser = async (
     return { user: null, error: 'Username already exists' };
   }
 
-  // Hash password and save user
   user.password = await bcrypt.hash(password, 10);
 
   try {

@@ -9,6 +9,9 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 
+/**
+ * User entity class
+ */
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()

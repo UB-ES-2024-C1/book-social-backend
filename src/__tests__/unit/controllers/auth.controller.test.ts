@@ -84,7 +84,9 @@ describe('Auth Controller - Login', () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
       message: 'Validation failed',
-      errors: ['Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters'],
+      errors: [
+        'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters',
+      ],
     });
   });
 
@@ -98,8 +100,8 @@ describe('Auth Controller - Login', () => {
       message: 'Validation failed',
       errors: [
         'Invalid email format',
-        'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters'
-      ]
+        'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters',
+      ],
     });
   });
 });
@@ -135,8 +137,8 @@ describe('Auth Controller - Register', () => {
         'Email is required',
         'Password is required',
         'Invalid email format',
-        'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters'
-      ]
+        'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters',
+      ],
     });
   });
 
