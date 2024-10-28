@@ -110,7 +110,21 @@ To run the application in production mode, use:
 pnpm start
 ```
 
-#### 8. Linting and Formatting
+#### 8. API Documentation (Swagger)
+
+The API documentation is available through Swagger UI. Once the application is running, you can access the documentation at:
+
+```
+http://localhost:3000/api-docs
+```
+
+This interactive documentation allows you to:
+- Browse all available API endpoints
+- See detailed request/response schemas
+- Test API endpoints directly from the browser
+- View authentication requirements
+
+#### 9. Linting and Formatting
 
 This project uses ESLint for linting and Prettier for code formatting. To run the linter, use:
 
@@ -128,7 +142,7 @@ To format the code using Prettier:
 pnpm format
 ```
 
-#### 9. Project Structure
+#### 10. Project Structure
 
 The main directories and files in the project are:
 
@@ -152,6 +166,6 @@ The main directories and files in the project are:
 - `pnpm-lock.yaml`: PNPM lock file
 - `README.md`: This file
 
-#### 10. TypeORM Configuration
+#### 11. TypeORM Configuration
 
 This project uses TypeORM for database operations. The TypeORM configuration can be found in `src/config/database.ts`. To create new entities (Tables), add them to the `src/entities` directory.
