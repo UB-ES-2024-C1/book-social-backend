@@ -1,6 +1,6 @@
 import { AppDataSource } from '../../../config/database';
 import { User } from '../../../entities/User';
-import { loginUser } from '../../../services/auth.service';
+import { loginUser, registerUser } from '../../../services/auth.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -9,6 +9,8 @@ jest.mock('../../../config/database', () => ({
   AppDataSource: {
     getRepository: jest.fn().mockReturnValue({
       findOne: jest.fn(),
+      create: jest.fn(),
+      save: jest.fn(),
     }),
   },
 }));
@@ -18,7 +20,8 @@ describe('Auth Service', () => {
   let mockUser: User;
 
   beforeEach(async () => {
-    // Create a mock user
+    jest.clearAllMocks();
+
     mockUser = {
       id: 1,
       firstName: 'John',
@@ -29,6 +32,7 @@ describe('Auth Service', () => {
     } as User;
 
     userRepositoryMock = AppDataSource.getRepository(User);
+    userRepositoryMock.findOne.mockReset();
   });
 
   it('should return null for non-existent user', async () => {
@@ -55,5 +59,76 @@ describe('Auth Service', () => {
 
     const decoded = jwt.verify(result as string, process.env.JWT_SECRET);
     expect(decoded).toHaveProperty('id', 1);
+  });
+
+  describe('Register', () => {
+    it('should return error when email already exists', async () => {
+      userRepositoryMock.findOne
+        .mockResolvedValueOnce(mockUser) // Email check
+        .mockResolvedValueOnce(null); // Username check
+
+      const result = await registerUser(
+        'John',
+        'Doe',
+        'newusername',
+        'john@example.com',
+        'password123'
+      );
+
+      expect(result).toEqual({
+        user: null,
+        error: 'Email already exists',
+      });
+    });
+
+    it('should return error when username already exists', async () => {
+      const findOneMock = userRepositoryMock.findOne;
+
+      findOneMock
+        .mockImplementationOnce(() => Promise.resolve(null)) // Primera llamada (email check)
+        .mockImplementationOnce(() => Promise.resolve(mockUser)); // Segunda llamada (username check)
+
+      const result = await registerUser(
+        'John',
+        'Doe',
+        'johndoe',
+        'newemail@example.com',
+        'password123'
+      );
+
+      expect(findOneMock).toHaveBeenCalledTimes(2);
+      expect(findOneMock).toHaveBeenNthCalledWith(1, {
+        where: { email: 'newemail@example.com' },
+      });
+      expect(findOneMock).toHaveBeenNthCalledWith(2, {
+        where: { username: 'johndoe' },
+      });
+
+      expect(result).toEqual({
+        user: null,
+        error: 'Username already exists',
+      });
+    });
+
+    it('should create and return a new user for valid registration data', async () => {
+      userRepositoryMock.findOne
+        .mockResolvedValueOnce(null) // Email check
+        .mockResolvedValueOnce(null); // Username check
+      userRepositoryMock.create.mockReturnValue(mockUser);
+      userRepositoryMock.save.mockResolvedValue(mockUser);
+
+      const result = await registerUser(
+        'John',
+        'Doe',
+        'johndoe',
+        'john@example.com',
+        'password123'
+      );
+
+      expect(result).toEqual({
+        user: mockUser,
+      });
+      expect(result.user).toHaveProperty('id', 1);
+    });
   });
 });

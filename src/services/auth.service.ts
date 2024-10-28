@@ -20,3 +20,38 @@ export const loginUser = async (
   });
   return token;
 };
+
+export const registerUser = async (
+  firstName: string,
+  lastName: string,
+  username: string,
+  email: string,
+  password: string
+): Promise<{ user: User | null; error?: string }> => {
+  const existingEmail = await userRepository.findOne({
+    where: { email },
+  });
+  if (existingEmail) {
+    return { user: null, error: 'Email already exists' };
+  }
+
+  const existingUsername = await userRepository.findOne({
+    where: { username },
+  });
+  if (existingUsername) {
+    return { user: null, error: 'Username already exists' };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = userRepository.create({
+    firstName,
+    lastName,
+    username,
+    email,
+    password: hashedPassword,
+  });
+
+  await userRepository.save(newUser);
+
+  return { user: newUser };
+};
