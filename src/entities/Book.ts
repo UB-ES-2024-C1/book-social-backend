@@ -1,6 +1,15 @@
 import 'reflect-metadata';
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { Length, IsNotEmpty, IsUrl, IsDate, IsInt, Min } from 'class-validator';
+import {
+  Length,
+  IsNotEmpty,
+  IsUrl,
+  IsDate,
+  IsInt,
+  Min,
+  IsNumber,
+  Max,
+} from 'class-validator';
 
 /**
  * Book entity class
@@ -47,4 +56,10 @@ export class Book {
   @Column({ length: 255, nullable: true })
   @Length(0, 255, { message: 'Publisher must be up to 255 characters' })
   publisher?: string;
+
+  @Column({ nullable: true })
+  @Min(0, { message: 'Review value must be at least 0' })
+  @IsNumber({}, { message: 'Review value must be a number' })
+  @Max(5, { message: 'Review value must be at most 5' })
+  reviewValue?: number;
 }
