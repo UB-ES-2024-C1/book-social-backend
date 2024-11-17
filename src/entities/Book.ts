@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import {
   Length,
   IsNotEmpty,
@@ -10,6 +10,7 @@ import {
   IsNumber,
   Max,
 } from 'class-validator';
+import { User } from './User';
 
 /**
  * Book entity class
@@ -26,12 +27,8 @@ export class Book {
   })
   title!: string;
 
-  @Column()
-  @IsNotEmpty({ message: 'Author is required' })
-  @Length(1, 255, {
-    message: 'Author must be between 1 and 255 characters',
-  })
-  author!: string;
+  @ManyToOne(() => User, (user) => user.books)
+  author!: User;
 
   @Column({ type: 'date' })
   @IsDate({ message: 'Publication date must be a valid date' })
