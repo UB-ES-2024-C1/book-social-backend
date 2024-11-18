@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import {
   IsEmail,
   Length,
@@ -9,6 +9,7 @@ import {
   IsNotEmpty,
   IsEnum,
 } from 'class-validator';
+import { Book } from './Book';
 
 /**
  * User entity class
@@ -96,4 +97,7 @@ export class User {
   @IsNotEmpty({ message: 'Role is required' })
   @IsEnum(UserRole, { message: 'Invalid role. Must be either reader or writer' })
   role!: UserRole;
+
+  @OneToMany(() => Book, (book) => book.author)
+  books?: Book[];
 }
