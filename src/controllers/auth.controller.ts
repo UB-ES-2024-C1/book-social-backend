@@ -51,7 +51,7 @@ export const register = async (
   next: NextFunction
 ) => {
   try {
-    const { firstName, lastName, username, email, password } = req.body;
+    const { firstName, lastName, username, email, password, role } = req.body;
 
     const validation = validateRegisterInput(
       firstName,
@@ -74,7 +74,8 @@ export const register = async (
       lastName,
       username,
       email,
-      password
+      password,
+      role
     );
 
     if (!result.user) {

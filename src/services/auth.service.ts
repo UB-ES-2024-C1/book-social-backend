@@ -1,5 +1,5 @@
 import { AppDataSource } from '../config/database';
-import { User } from '../entities/User';
+import { User, UserRole } from '../entities/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { validate } from 'class-validator';
@@ -44,7 +44,8 @@ export const registerUser = async (
   lastName: string,
   username: string,
   email: string,
-  password: string
+  password: string,
+  role: UserRole = UserRole.READER
 ): Promise<{ user: User | null; error?: string }> => {
   const user = new User();
   Object.assign(user, {
@@ -53,6 +54,7 @@ export const registerUser = async (
     username,
     email,
     password,
+    role
   });
 
   const errors = await validate(user);
