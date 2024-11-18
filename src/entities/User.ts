@@ -7,12 +7,18 @@ import {
   MinLength,
   MaxLength,
   IsNotEmpty,
+  IsEnum,
 } from 'class-validator';
 import { Book } from './Book';
 
 /**
  * User entity class
  */
+export enum UserRole {
+  READER = 'reader',
+  WRITER = 'writer'
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -53,6 +59,8 @@ export class User {
       'Username can only contain letters, numbers, underscores and dashes',
   })
   username!: string;
+  
+  
 
   @Column({ unique: true })
   @IsNotEmpty({ message: 'Email is required' })
@@ -80,6 +88,15 @@ export class User {
       'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
   })
   password!: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.READER
+  })
+  @IsNotEmpty({ message: 'Role is required' })
+  @IsEnum(UserRole, { message: 'Invalid role. Must be either reader or writer' })
+  role!: UserRole;
 
   @OneToMany(() => Book, (book) => book.author)
   books?: Book[];
