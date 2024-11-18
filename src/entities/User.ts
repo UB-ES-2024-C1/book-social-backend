@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import {
   IsEmail,
   Length,
@@ -8,6 +8,7 @@ import {
   MaxLength,
   IsNotEmpty,
 } from 'class-validator';
+import { Book } from './Book';
 
 /**
  * User entity class
@@ -79,4 +80,7 @@ export class User {
       'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
   })
   password!: string;
+
+  @OneToMany(() => Book, (book) => book.author)
+  books?: Book[];
 }
