@@ -53,7 +53,7 @@ describe('Review Controller', () => {
       title: 'Test Book',
       author: mockUser,
       publication_date: new Date(),
-      genre: 'Fiction',
+      genres: ['Fiction'],
     } as Book;
 
     mockReview = {
@@ -78,7 +78,9 @@ describe('Review Controller', () => {
 
     it('should create a review successfully', async () => {
       const mockServiceResponse = { review: mockReview };
-      (reviewService.createReview as jest.Mock).mockResolvedValue(mockServiceResponse);
+      (reviewService.createReview as jest.Mock).mockResolvedValue(
+        mockServiceResponse
+      );
 
       await create(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -92,7 +94,9 @@ describe('Review Controller', () => {
     it('should handle validation errors', async () => {
       mockRequest.body = {};
       const mockServiceResponse = { review: null, error: 'Validation failed' };
-      (reviewService.createReview as jest.Mock).mockResolvedValue(mockServiceResponse);
+      (reviewService.createReview as jest.Mock).mockResolvedValue(
+        mockServiceResponse
+      );
 
       await create(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -103,7 +107,9 @@ describe('Review Controller', () => {
     });
 
     it('should handle server errors', async () => {
-      (reviewService.createReview as jest.Mock).mockRejectedValue(new Error('Server error'));
+      (reviewService.createReview as jest.Mock).mockRejectedValue(
+        new Error('Server error')
+      );
 
       await create(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -124,18 +130,30 @@ describe('Review Controller', () => {
 
     it('should return reviews for a book successfully', async () => {
       const mockReviews = [mockReview];
-      (reviewService.getReviewsByBook as jest.Mock).mockResolvedValue({ reviews: mockReviews });
+      (reviewService.getReviewsByBook as jest.Mock).mockResolvedValue({
+        reviews: mockReviews,
+      });
 
-      await getByBook(mockRequest as Request, mockResponse as Response, mockNext);
+      await getByBook(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({ reviews: mockReviews });
     });
 
     it('should handle case when no reviews exist', async () => {
-      (reviewService.getReviewsByBook as jest.Mock).mockResolvedValue({ reviews: [] });
+      (reviewService.getReviewsByBook as jest.Mock).mockResolvedValue({
+        reviews: [],
+      });
 
-      await getByBook(mockRequest as Request, mockResponse as Response, mockNext);
+      await getByBook(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({ reviews: [] });
@@ -144,7 +162,11 @@ describe('Review Controller', () => {
     it('should handle invalid bookId parameter', async () => {
       mockRequest.params = { bookId: 'invalid' };
 
-      await getByBook(mockRequest as Request, mockResponse as Response, mockNext);
+      await getByBook(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -153,9 +175,15 @@ describe('Review Controller', () => {
     });
 
     it('should handle service errors', async () => {
-      (reviewService.getReviewsByBook as jest.Mock).mockRejectedValue(new Error('Service error'));
+      (reviewService.getReviewsByBook as jest.Mock).mockRejectedValue(
+        new Error('Service error')
+      );
 
-      await getByBook(mockRequest as Request, mockResponse as Response, mockNext);
+      await getByBook(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -174,18 +202,30 @@ describe('Review Controller', () => {
 
     it('should return reviews for a user successfully', async () => {
       const mockReviews = [mockReview];
-      (reviewService.getReviewsByUser as jest.Mock).mockResolvedValue({ reviews: mockReviews });
+      (reviewService.getReviewsByUser as jest.Mock).mockResolvedValue({
+        reviews: mockReviews,
+      });
 
-      await getByUser(mockRequest as Request, mockResponse as Response, mockNext);
+      await getByUser(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({ reviews: mockReviews });
     });
 
     it('should handle case when no reviews exist', async () => {
-      (reviewService.getReviewsByUser as jest.Mock).mockResolvedValue({ reviews: [] });
+      (reviewService.getReviewsByUser as jest.Mock).mockResolvedValue({
+        reviews: [],
+      });
 
-      await getByUser(mockRequest as Request, mockResponse as Response, mockNext);
+      await getByUser(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({ reviews: [] });
@@ -194,7 +234,11 @@ describe('Review Controller', () => {
     it('should handle invalid userId parameter', async () => {
       mockRequest.params = { userId: 'invalid' };
 
-      await getByUser(mockRequest as Request, mockResponse as Response, mockNext);
+      await getByUser(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -203,9 +247,15 @@ describe('Review Controller', () => {
     });
 
     it('should handle service errors', async () => {
-      (reviewService.getReviewsByUser as jest.Mock).mockRejectedValue(new Error('Service error'));
+      (reviewService.getReviewsByUser as jest.Mock).mockRejectedValue(
+        new Error('Service error')
+      );
 
-      await getByUser(mockRequest as Request, mockResponse as Response, mockNext);
+      await getByUser(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -223,7 +273,9 @@ describe('Review Controller', () => {
     });
 
     it('should delete a review successfully', async () => {
-      (reviewService.deleteReview as jest.Mock).mockResolvedValue({ success: true });
+      (reviewService.deleteReview as jest.Mock).mockResolvedValue({
+        success: true,
+      });
 
       await remove(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -234,9 +286,9 @@ describe('Review Controller', () => {
     });
 
     it('should handle non-existent review', async () => {
-      (reviewService.deleteReview as jest.Mock).mockResolvedValue({ 
-        success: false, 
-        error: 'Review not found' 
+      (reviewService.deleteReview as jest.Mock).mockResolvedValue({
+        success: false,
+        error: 'Review not found',
       });
 
       await remove(mockRequest as Request, mockResponse as Response, mockNext);
@@ -259,7 +311,9 @@ describe('Review Controller', () => {
     });
 
     it('should handle service errors', async () => {
-      (reviewService.deleteReview as jest.Mock).mockRejectedValue(new Error('Service error'));
+      (reviewService.deleteReview as jest.Mock).mockRejectedValue(
+        new Error('Service error')
+      );
 
       await remove(mockRequest as Request, mockResponse as Response, mockNext);
 

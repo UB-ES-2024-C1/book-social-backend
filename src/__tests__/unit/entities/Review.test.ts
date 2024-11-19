@@ -37,7 +37,7 @@ describe('Review Entity', () => {
       title: 'Test Book',
       author: mockUser,
       publication_date: new Date(),
-      genre: 'Fiction',
+      genres: ['Fiction'],
     });
 
     // Setup valid review data
@@ -52,17 +52,17 @@ describe('Review Entity', () => {
     it('should validate a review with all required fields', async () => {
       const review = new Review();
       Object.assign(review, validReviewData);
-      
+
       // Asignar created_at manualmente ya que no estamos usando la base de datos
       review.created_at = new Date();
 
       const errors = await validate(review);
-      
+
       // Si hay errores, mostrarlos para debugging
       if (errors.length > 0) {
         console.log('Validation errors:', errors);
       }
-      
+
       expect(errors.length).toBe(0);
     });
 
@@ -73,14 +73,15 @@ describe('Review Entity', () => {
       review.created_at = new Date();
 
       const errors = await validate(review);
-      
-      const userErrors = errors.filter(error => 
-        error.property === 'user' &&
-        error.constraints?.isNotEmpty
+
+      const userErrors = errors.filter(
+        (error) => error.property === 'user' && error.constraints?.isNotEmpty
       );
-      
+
       expect(userErrors.length).toBeGreaterThan(0);
-      expect(userErrors[0].constraints?.isNotEmpty).toContain('User is required');
+      expect(userErrors[0].constraints?.isNotEmpty).toContain(
+        'User is required'
+      );
     });
 
     it('should fail validation when book is missing', async () => {
@@ -90,14 +91,15 @@ describe('Review Entity', () => {
       review.created_at = new Date();
 
       const errors = await validate(review);
-      
-      const bookErrors = errors.filter(error => 
-        error.property === 'book' &&
-        error.constraints?.isNotEmpty
+
+      const bookErrors = errors.filter(
+        (error) => error.property === 'book' && error.constraints?.isNotEmpty
       );
-      
+
       expect(bookErrors.length).toBeGreaterThan(0);
-      expect(bookErrors[0].constraints?.isNotEmpty).toContain('Book is required');
+      expect(bookErrors[0].constraints?.isNotEmpty).toContain(
+        'Book is required'
+      );
     });
 
     it('should fail validation when rating is missing', async () => {
@@ -107,14 +109,15 @@ describe('Review Entity', () => {
       review.created_at = new Date();
 
       const errors = await validate(review);
-      
-      const ratingErrors = errors.filter(error => 
-        error.property === 'rating' &&
-        error.constraints?.isNotEmpty
+
+      const ratingErrors = errors.filter(
+        (error) => error.property === 'rating' && error.constraints?.isNotEmpty
       );
-      
+
       expect(ratingErrors.length).toBeGreaterThan(0);
-      expect(ratingErrors[0].constraints?.isNotEmpty).toContain('Rating is required');
+      expect(ratingErrors[0].constraints?.isNotEmpty).toContain(
+        'Rating is required'
+      );
     });
 
     it('should fail validation when rating is less than 0', async () => {
@@ -123,14 +126,15 @@ describe('Review Entity', () => {
       review.created_at = new Date();
 
       const errors = await validate(review);
-      
-      const ratingErrors = errors.filter(error => 
-        error.property === 'rating' &&
-        error.constraints?.min
+
+      const ratingErrors = errors.filter(
+        (error) => error.property === 'rating' && error.constraints?.min
       );
-      
+
       expect(ratingErrors.length).toBeGreaterThan(0);
-      expect(ratingErrors[0].constraints?.min).toContain('Rating must be at least 0');
+      expect(ratingErrors[0].constraints?.min).toContain(
+        'Rating must be at least 0'
+      );
     });
 
     it('should fail validation when rating is greater than 5', async () => {
@@ -139,33 +143,35 @@ describe('Review Entity', () => {
       review.created_at = new Date();
 
       const errors = await validate(review);
-      
-      const ratingErrors = errors.filter(error => 
-        error.property === 'rating' &&
-        error.constraints?.max
+
+      const ratingErrors = errors.filter(
+        (error) => error.property === 'rating' && error.constraints?.max
       );
-      
+
       expect(ratingErrors.length).toBeGreaterThan(0);
-      expect(ratingErrors[0].constraints?.max).toContain('Rating must be at most 5');
+      expect(ratingErrors[0].constraints?.max).toContain(
+        'Rating must be at most 5'
+      );
     });
 
     it('should fail validation when rating is not a number', async () => {
       const review = new Review();
-      Object.assign(review, { 
-        ...validReviewData, 
-        rating: 'not a number' as unknown as number 
+      Object.assign(review, {
+        ...validReviewData,
+        rating: 'not a number' as unknown as number,
       });
       review.created_at = new Date();
 
       const errors = await validate(review);
-      
-      const ratingErrors = errors.filter(error => 
-        error.property === 'rating' &&
-        error.constraints?.isNumber
+
+      const ratingErrors = errors.filter(
+        (error) => error.property === 'rating' && error.constraints?.isNumber
       );
-      
+
       expect(ratingErrors.length).toBeGreaterThan(0);
-      expect(ratingErrors[0].constraints?.isNumber).toContain('Rating must be a number');
+      expect(ratingErrors[0].constraints?.isNumber).toContain(
+        'Rating must be a number'
+      );
     });
   });
 
@@ -178,7 +184,9 @@ describe('Review Entity', () => {
       });
 
       const errors = await validate(review);
-      expect(errors.filter(error => error.property === 'created_at').length).toBe(0);
+      expect(
+        errors.filter((error) => error.property === 'created_at').length
+      ).toBe(0);
     });
 
     it('should fail validation if created_at is set to invalid date', async () => {
@@ -189,12 +197,11 @@ describe('Review Entity', () => {
       });
 
       const errors = await validate(review);
-      
-      const dateErrors = errors.filter(error => 
-        error.property === 'created_at' &&
-        error.constraints?.isDate
+
+      const dateErrors = errors.filter(
+        (error) => error.property === 'created_at' && error.constraints?.isDate
       );
-      
+
       expect(dateErrors.length).toBeGreaterThan(0);
       expect(dateErrors[0].constraints?.isDate).toContain(
         'Created date must be a valid date'
@@ -224,3 +231,4 @@ describe('Review Entity', () => {
     });
   });
 });
+

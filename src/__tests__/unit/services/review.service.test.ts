@@ -69,7 +69,7 @@ describe('Review Service', () => {
       title: 'Test Book',
       author: mockUser,
       publication_date: new Date(),
-      genre: 'Fiction',
+      genres: ['Fiction'],
     } as Book;
 
     // Create mock review
@@ -224,4 +224,3 @@ describe('Review Service', () => {
     });
   });
 });
-

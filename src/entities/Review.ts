@@ -6,13 +6,7 @@ import {
   ManyToOne,
   CreateDateColumn,
 } from 'typeorm';
-import {
-  IsNotEmpty,
-  IsNumber,
-  Min,
-  Max,
-  IsDate,
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, Min, Max, IsDate } from 'class-validator';
 import { User } from './User';
 import { Book } from './Book';
 

@@ -30,10 +30,10 @@ export const validateBookInput = (
     errors.push('Author is required');
   }
 
-  if (!bookData.genre) {
+  if (!bookData.genres) {
     errors.push('Genre is required');
-  } else if (bookData.genre.trim().length < 1 || bookData.genre.length > 100) {
-    errors.push('Genre must be between 1 and 100 characters');
+  } else if (bookData.genres.length === 0) {
+    errors.push('At least one genre is required');
   }
 
   // Validación de fecha

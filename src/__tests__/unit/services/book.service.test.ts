@@ -41,7 +41,7 @@ describe('Book Service', () => {
       title: 'Test Book',
       author: mockUser,
       publication_date: new Date('2024-03-20'),
-      genre: 'Fiction',
+      genres: ['Fiction'],
       synopsis: 'Test synopsis',
       image_url: 'https://example.com/image.jpg',
       num_pages: 200,
@@ -144,12 +144,12 @@ describe('Book Service', () => {
 
       // Creamos un objeto que omite el autor
       const { author, ...bookWithoutAuthor } = mockBook;
-      
+
       // Creamos un nuevo objeto con el ID del autor
       const bookInput = {
         ...bookWithoutAuthor,
         // Usamos unknown como tipo intermedio para evitar el error de tipado
-        author: mockUser.id as unknown as User
+        author: mockUser.id as unknown as User,
       };
 
       const result = await createBook(bookInput);
@@ -171,11 +171,11 @@ describe('Book Service', () => {
 
       it('should handle invalid author id format', async () => {
         const { author, ...bookWithoutAuthor } = mockBook;
-        
+
         // Usamos unknown como tipo intermedio
         const invalidBookData = {
           ...bookWithoutAuthor,
-          author: 'invalid-id' as unknown as User
+          author: 'invalid-id' as unknown as User,
         };
 
         const result = await createBook(invalidBookData);
@@ -186,13 +186,13 @@ describe('Book Service', () => {
 
       it('should handle optional fields being undefined', async () => {
         userRepositoryMock.findOne.mockResolvedValue(mockUser);
-        
+
         // Solo incluimos los campos requeridos
         const minimalBookData: Partial<Book> = {
           title: 'Test Book',
           author: mockUser,
           publication_date: new Date('2024-03-20'),
-          genre: 'Fiction'
+          genres: ['Fiction'],
         };
 
         const result = await createBook(minimalBookData);

@@ -25,9 +25,10 @@ export const createBook = async (
     // Validate author exists
     if (bookData.author) {
       try {
-        const authorId = typeof bookData.author === 'number' 
-          ? bookData.author 
-          : (bookData.author as User).id;
+        const authorId =
+          typeof bookData.author === 'number'
+            ? bookData.author
+            : (bookData.author as User).id;
 
         if (!authorId || typeof authorId !== 'number') {
           return { book: null, error: 'Invalid author ID format' };
@@ -44,6 +45,15 @@ export const createBook = async (
       } catch (error) {
         console.error('Error processing author:', error);
         return { book: null, error: 'Invalid author data' };
+      }
+    }
+
+    if (bookData.publication_date) {
+      try {
+        bookData.publication_date = new Date(bookData.publication_date);
+      } catch (error) {
+        console.error('Error processing date:', error);
+        return { book: null, error: 'Invalid publication date' };
       }
     }
 
@@ -66,4 +76,10 @@ export const createBook = async (
     console.error('Error creating book:', error);
     return { book: null, error: 'Error saving book to database' };
   }
+};
+
+export const getBook = async (id: number): Promise<Book | null> => {
+  const book = await bookRepository.findOne({ where: { id } });
+  if (!book) return null;
+  return book;
 };

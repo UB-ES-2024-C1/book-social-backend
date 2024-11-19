@@ -21,7 +21,7 @@ describe('Book Validation', () => {
     title: 'Test Book',
     author: mockUser,
     publication_date: new Date('2024-03-20'),
-    genre: 'Fiction',
+    genres: ['Fiction'],
     num_pages: 200,
     publisher: 'Test Publisher',
     image_url: 'https://example.com/image.jpg',
@@ -43,9 +43,9 @@ describe('Book Validation', () => {
       expect(result.errors).toContain('Title is required');
     });
 
-    it('should fail when genre is missing', () => {
-      const { genre, ...bookWithoutGenre } = validBookData;
-      const result = validateBookInput(bookWithoutGenre);
+    it('should fail when genres is missing', () => {
+      const { genres, ...bookWithoutGenres } = validBookData;
+      const result = validateBookInput(bookWithoutGenres);
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('Genre is required');
@@ -90,19 +90,6 @@ describe('Book Validation', () => {
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain('Title is required');
-    });
-
-    it('should fail when genre exceeds 100 characters', () => {
-      const longGenre = 'a'.repeat(101);
-      const result = validateBookInput({
-        ...validBookData,
-        genre: longGenre,
-      });
-
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
-        'Genre must be between 1 and 100 characters'
-      );
     });
   });
 
@@ -228,7 +215,7 @@ describe('Book Validation', () => {
         title: 'Test Book',
         author: mockUser,
         publication_date: new Date('2024-03-20'),
-        genre: 'Fiction',
+        genres: ['Fiction'],
       };
 
       const result = validateBookInput(minimalBook);
