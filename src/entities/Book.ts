@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import {
   Length,
   IsNotEmpty,
@@ -11,6 +11,7 @@ import {
   Max,
 } from 'class-validator';
 import { User } from './User';
+import { Review } from './Review';
 
 /**
  * Book entity class
@@ -59,4 +60,7 @@ export class Book {
   @IsNumber({}, { message: 'Review value must be a number' })
   @Max(5, { message: 'Review value must be at most 5' })
   reviewValue?: number;
+
+  @OneToMany(() => Review, (review) => review.book)
+  reviews?: Review[];
 }
