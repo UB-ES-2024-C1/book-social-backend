@@ -10,6 +10,7 @@ import {
   IsEnum,
 } from 'class-validator';
 import { Book } from './Book';
+import { Review } from './Review';
 
 /**
  * User entity class
@@ -100,4 +101,7 @@ export class User {
 
   @OneToMany(() => Book, (book) => book.author)
   books?: Book[];
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews?: Review[];
 }
