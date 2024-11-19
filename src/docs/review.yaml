@@ -1,0 +1,94 @@
+/reviews:
+  post:
+    tags:
+      - Reviews
+    summary: Create a new review
+    description: Create a new review for a book
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - book
+              - rating
+            properties:
+              user:
+                type: integer
+                description: User ID
+                example: 1
+              book:
+                type: integer
+                description: Book ID
+                example: 1
+              rating:
+                type: number
+                minimum: 0
+                maximum: 5
+                description: Rating value between 0 and 5
+                example: 4.5
+    responses:
+      '201':
+        description: Review created successfully
+      '400':
+        description: Invalid input
+      '500':
+        description: Server error
+
+/reviews/book/{bookId}:
+  get:
+    tags:
+      - Reviews
+    summary: Get reviews by book
+    parameters:
+      - in: path
+        name: bookId
+        required: true
+        schema:
+          type: integer
+        description: ID of the book
+    responses:
+      '200':
+        description: List of reviews for the book
+      '500':
+        description: Server error
+
+/reviews/user/{userId}:
+  get:
+    tags:
+      - Reviews
+    summary: Get reviews by user
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+        description: ID of the user
+    responses:
+      '200':
+        description: List of reviews by the user
+      '500':
+        description: Server error
+
+/reviews/{reviewId}:
+  delete:
+    tags:
+      - Reviews
+    summary: Delete a review
+    parameters:
+      - in: path
+        name: reviewId
+        required: true
+        schema:
+          type: integer
+        description: ID of the review to delete
+    responses:
+      '200':
+        description: Review deleted successfully
+      '400':
+        description: Invalid review ID
+      '500':
+        description: Server error
