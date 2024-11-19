@@ -9,6 +9,10 @@ import {
   Min,
   IsNumber,
   Max,
+  IsArray,
+  ArrayMinSize,
+  ArrayMaxSize,
+  ArrayNotEmpty,
 } from 'class-validator';
 import { User } from './User';
 
@@ -34,9 +38,16 @@ export class Book {
   @IsDate({ message: 'Publication date must be a valid date' })
   publication_date!: Date;
 
-  @Column({ length: 100 })
-  @Length(1, 100, { message: 'Genre must be up to 100 characters' })
-  genre!: string;
+  @Column('text', { array: true })
+  @IsArray({ message: 'Genre must be an array of strings' })
+  @ArrayNotEmpty({ message: 'Genre must contain at least one genre' })
+  @ArrayMinSize(1, { message: 'Genre must contain at least one item' })
+  @ArrayMaxSize(10, { message: 'Genre cannot contain more than 10 items' })
+  @Length(1, 100, {
+    each: true,
+    message: 'Each genre must be between 1 and 100 characters',
+  })
+  genres!: string[];
 
   @Column('text', { nullable: true })
   synopsis?: string;

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { AppDataSource } from './config/database';
 import authRoutes from './routes/auth.routes';
+import bookRoutes from './routes/book.routes';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger';
 
@@ -13,7 +14,7 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-  maxAge: 86400
+  maxAge: 86400,
 };
 
 // Middleware
@@ -38,6 +39,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', authRoutes);
+app.use('/books', bookRoutes);
 
 // TODO: Error handling middleware
 // app.use(futureErrorHandler)

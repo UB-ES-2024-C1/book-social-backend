@@ -1,7 +1,7 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
-const serverUrl = `${process.env.HOST || 'localhost'}:${process.env.PORT || 3000}`;
+const serverUrl = `${process.env.HOST || 'localhost'}:3000`;
 
 const swaggerOptions = {
   definition: {

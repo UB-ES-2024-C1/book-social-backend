@@ -1,0 +1,68 @@
+openapi: 3.0.0
+info:
+  title: 'Book API'
+  description: 'API for retrieving book details'
+  version: '1.0.0'
+
+paths:
+  /books/book-detail/{bookId}:
+    get:
+      tags:
+        - Books
+      summary: 'Retrieve a book by ID'
+      description: 'Fetches a single book details based on the provided book ID.'
+      parameters:
+        - in: path
+          name: bookId
+          required: true
+          description: 'The ID of the book to retrieve'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successfully retrieved the book details'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: 'The ID of the book'
+                  title:
+                    type: string
+                    description: 'The title of the book'
+                  author:
+                    type: string
+                    description: 'The author of the book'
+                  publication_date:
+                    type: string
+                    format: date
+                    description: 'The publication date of the book'
+                  genre:
+                    type: array
+                    items:
+                      type: string
+                    description: 'An array of genres for the book'
+                  synopsis:
+                    type: string
+                    description: 'A short summary of the book'
+                  image_url:
+                    type: string
+                    description: 'The URL of the books cover image'
+                  num_pages:
+                    type: integer
+                    description: 'The number of pages in the book'
+                  publisher:
+                    type: string
+                    description: 'The publisher of the book'
+                  ISBN:
+                    type: string
+                    description: 'The ISBN (International Standard Book Number) of the book'
+                  ASIN:
+                    type: string
+                    description: 'The ASIN (Amazon Standard Identification Number) of the book'
+        '404':
+          description: 'Book not found'
+        '500':
+          description: 'Internal server error'
