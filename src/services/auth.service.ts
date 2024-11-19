@@ -54,7 +54,7 @@ export const registerUser = async (
     username,
     email,
     password,
-    role
+    role,
   });
 
   const errors = await validate(user);
