@@ -1,5 +1,11 @@
 import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import {
   Length,
   IsNotEmpty,
@@ -14,7 +20,9 @@ import {
   ArrayMaxSize,
   ArrayNotEmpty,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { User } from './User';
+import { Review } from './Review';
 
 /**
  * Book entity class
@@ -36,6 +44,7 @@ export class Book {
 
   @Column({ type: 'date' })
   @IsDate({ message: 'Publication date must be a valid date' })
+  @Type(() => Date)
   publication_date!: Date;
 
   @Column('text', { array: true })
@@ -43,10 +52,6 @@ export class Book {
   @ArrayNotEmpty({ message: 'Genre must contain at least one genre' })
   @ArrayMinSize(1, { message: 'Genre must contain at least one item' })
   @ArrayMaxSize(10, { message: 'Genre cannot contain more than 10 items' })
-  @Length(1, 100, {
-    each: true,
-    message: 'Each genre must be between 1 and 100 characters',
-  })
   genres!: string[];
 
   @Column('text', { nullable: true })
@@ -65,9 +70,12 @@ export class Book {
   @Length(0, 255, { message: 'Publisher must be up to 255 characters' })
   publisher?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   @Min(0, { message: 'Review value must be at least 0' })
   @IsNumber({}, { message: 'Review value must be a number' })
   @Max(5, { message: 'Review value must be at most 5' })
   reviewValue?: number;
+
+  @OneToMany(() => Review, (review) => review.book)
+  reviews?: Review[];
 }

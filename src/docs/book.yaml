@@ -1,9 +1,4 @@
 openapi: 3.0.0
-info:
-  title: 'Book API'
-  description: 'API for retrieving book details'
-  version: '1.0.0'
-
 paths:
   /books/book-detail/{bookId}:
     get:
@@ -66,3 +61,104 @@ paths:
           description: 'Book not found'
         '500':
           description: 'Internal server error'
+  /books:
+    post:
+      tags:
+        - Books
+      summary: Create a new book
+      description: Create a new book in the system
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - author
+                - publication_date
+                - genre
+              properties:
+                title:
+                  type: string
+                  example: 'The Great Gatsby'
+                author:
+                  type: number
+                  example: 1
+                publication_date:
+                  type: string
+                  format: date
+                  example: '1925-04-10'
+                genres:
+                  type: string[]
+                  example: ['Fiction']
+                synopsis:
+                  type: string
+                  example: 'A story of decadence and excess...'
+                image_url:
+                  type: string
+                  format: uri
+                  example: 'https://example.com/book-cover.jpg'
+                num_pages:
+                  type: integer
+                  minimum: 1
+                  example: 180
+                publisher:
+                  type: string
+                  example: "Charles Scribner's Sons"
+                reviewValue:
+                  type: number
+                  minimum: 0
+                  maximum: 5
+                  example: 4.5
+      responses:
+        '201':
+          description: Book created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Book created successfully'
+                  book:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      title:
+                        type: string
+                      author:
+                        type: object
+                      publication_date:
+                        type: string
+                        format: date
+                      genre:
+                        type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Validation failed'
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error creating book'

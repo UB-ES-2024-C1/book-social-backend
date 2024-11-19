@@ -13,7 +13,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: serverUrl || 'http://localhost:3000',
+        url: 'http://localhost:3000',
         description: isDevelopment
           ? 'Servidor de desarrollo'
           : 'Servidor de producción',

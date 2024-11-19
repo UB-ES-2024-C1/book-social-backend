@@ -10,13 +10,14 @@ import {
   IsEnum,
 } from 'class-validator';
 import { Book } from './Book';
+import { Review } from './Review';
 
 /**
  * User entity class
  */
 export enum UserRole {
   READER = 'reader',
-  WRITER = 'writer'
+  WRITER = 'writer',
 }
 
 @Entity()
@@ -59,8 +60,6 @@ export class User {
       'Username can only contain letters, numbers, underscores and dashes',
   })
   username!: string;
-  
-  
 
   @Column({ unique: true })
   @IsNotEmpty({ message: 'Email is required' })
@@ -92,12 +91,17 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserRole,
-    default: UserRole.READER
+    default: UserRole.READER,
   })
   @IsNotEmpty({ message: 'Role is required' })
-  @IsEnum(UserRole, { message: 'Invalid role. Must be either reader or writer' })
+  @IsEnum(UserRole, {
+    message: 'Invalid role. Must be either reader or writer',
+  })
   role!: UserRole;
 
   @OneToMany(() => Book, (book) => book.author)
   books?: Book[];
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews?: Review[];
 }
