@@ -95,20 +95,66 @@ DB_USERNAME=your_username
 DB_PASSWORD=your_password
 DB_DATABASE=your_database_name
 ```
-#### 7. Running the Application
+#### 7. Available Scripts
 
-To start the development server, run the following command:
+The project includes several PNPM scripts for different tasks:
 
+**Development and Build:**
 ```bash
-pnpm run dev
-```
-
-This will start the server using nodemon, which will automatically restart the server when file changes are detected.
-
-To run the application in production mode, use:
-```bash
+# Start the server in production mode
 pnpm start
+
+# Start the server in development mode with automatic reload
+pnpm dev
+
+# Compile the TypeScript project
+pnpm build
 ```
+
+**Testing:**
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode (useful during development)
+pnpm test:watch
+
+# Run only unit tests
+pnpm test:unit
+
+# Run only integration tests
+pnpm test:integration
+
+# Generate a code coverage report
+pnpm test:coverage
+
+# Run tests in CI environment with specific report
+pnpm test:ci
+```
+
+The coverage reports are generated in the `coverage/` directory and include:
+- Summary in console (text-summary)
+- Interactive HTML report
+- Additional formats (lcov, clover, json) for integration with tools
+
+**Code Quality:**
+```bash
+# Run the linter to check the code
+pnpm lint
+
+# Automatically fix linting issues
+pnpm lint:fix
+
+# Format the code using Prettier
+pnpm format
+```
+
+**Coverage Thresholds:**
+The project maintains strict quality standards with minimum coverage thresholds:
+- Branches: 80%
+- Functions: 80%
+- Lines: 80%
+- Statements: 80%
 
 #### 8. API Documentation (Swagger)
 
@@ -126,45 +172,49 @@ This interactive documentation allows you to:
 
 #### 9. Linting and Formatting
 
-This project uses ESLint for linting and Prettier for code formatting. To run the linter, use:
+The project uses a combination of tools to maintain code quality:
 
-```bash
-pnpm lint
-```
+**ESLint:**
+- Configured with specific rules for TypeScript
+- Integrated with Prettier to avoid conflicts
+- Custom rules in `.eslintrc`
 
-To automatically fix linting issues:
-```bash
-pnpm lint:fix
-```
+**Prettier:**
+- Consistent code formatting
+- Configuration in `.prettierrc`
+- Ignored files in `.prettierignore`
 
-To format the code using Prettier:
-```bash
-pnpm format
-```
+**Recommended Workflow:**
+1. Use `pnpm format` before commits
+2. Run `pnpm lint` to check for issues
+3. Use `pnpm lint:fix` for automatic fixes
+4. Run tests with `pnpm test` before push
 
 #### 10. Project Structure
 
-The main directories and files in the project are:
+The project structure is organized as follows:
 
-- `src/`: Contains the source code of the application
-  - `config/`: Configuration files, including database setup
-  - `controllers/`: Request handlers
-  - `entities/`: TypeORM entities
-  - `middlewares/`: Express middlewares
-  - `models/`: Data models
-  - `routes/`: API route definitions
-  - `services/`: Business logic
-  - `utils/`: Utility functions
-  - `app.ts`: Express application setup
-  - `server.ts`: Server entry point
-- `package.json`: Project dependencies and scripts
-- `tsconfig.json`: TypeScript configuration
-- `.eslintrc`: ESLint configuration
-- `.prettierignore`: Prettier ignore file
-- `.prettierrc`: Prettier configuration
-- `package.json`: Project dependencies and scripts
-- `pnpm-lock.yaml`: PNPM lock file
-- `README.md`: This file
+```
+src/
+├── __tests__/           # Tests organized by type
+│   ├── integration/     # Integration tests
+│   └── unit/           # Unit tests
+├── config/             # Configurations (DB, Swagger, etc.)
+├── controllers/        # Route controllers
+├── docs/              # Swagger/OpenAPI documentation
+├── entities/          # TypeORM entities
+├── middlewares/       # Express middlewares
+├── routes/            # Route definitions
+├── services/          # Business logic
+├── utils/             # Utilities and helpers
+├── app.ts            # Express configuration
+└── server.ts         # Entry point
+
+config/
+├── jest.config.js     # Jest configuration
+├── tsconfig.json      # TypeScript configuration
+└── .env              # Environment variables (not in repo)
+```
 
 #### 11. TypeORM Configuration
 

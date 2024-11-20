@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import {
   IsEmail,
   Length,
@@ -7,11 +7,19 @@ import {
   MinLength,
   MaxLength,
   IsNotEmpty,
+  IsEnum,
 } from 'class-validator';
+import { Book } from './Book';
+import { Review } from './Review';
 
 /**
  * User entity class
  */
+export enum UserRole {
+  READER = 'reader',
+  WRITER = 'writer',
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -79,4 +87,21 @@ export class User {
       'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
   })
   password!: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.READER,
+  })
+  @IsNotEmpty({ message: 'Role is required' })
+  @IsEnum(UserRole, {
+    message: 'Invalid role. Must be either reader or writer',
+  })
+  role!: UserRole;
+
+  @OneToMany(() => Book, (book) => book.author)
+  books?: Book[];
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews?: Review[];
 }
