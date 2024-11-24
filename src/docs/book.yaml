@@ -1,0 +1,164 @@
+openapi: 3.0.0
+paths:
+  /books/book-detail/{bookId}:
+    get:
+      tags:
+        - Books
+      summary: 'Retrieve a book by ID'
+      description: 'Fetches a single book details based on the provided book ID.'
+      parameters:
+        - in: path
+          name: bookId
+          required: true
+          description: 'The ID of the book to retrieve'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successfully retrieved the book details'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: 'The ID of the book'
+                  title:
+                    type: string
+                    description: 'The title of the book'
+                  author:
+                    type: string
+                    description: 'The author of the book'
+                  publication_date:
+                    type: string
+                    format: date
+                    description: 'The publication date of the book'
+                  genre:
+                    type: array
+                    items:
+                      type: string
+                    description: 'An array of genres for the book'
+                  synopsis:
+                    type: string
+                    description: 'A short summary of the book'
+                  image_url:
+                    type: string
+                    description: 'The URL of the books cover image'
+                  num_pages:
+                    type: integer
+                    description: 'The number of pages in the book'
+                  publisher:
+                    type: string
+                    description: 'The publisher of the book'
+                  ISBN:
+                    type: string
+                    description: 'The ISBN (International Standard Book Number) of the book'
+                  ASIN:
+                    type: string
+                    description: 'The ASIN (Amazon Standard Identification Number) of the book'
+        '404':
+          description: 'Book not found'
+        '500':
+          description: 'Internal server error'
+  /books:
+    post:
+      tags:
+        - Books
+      summary: Create a new book
+      description: Create a new book in the system
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - author
+                - publication_date
+                - genre
+              properties:
+                title:
+                  type: string
+                  example: 'The Great Gatsby'
+                author:
+                  type: number
+                  example: 1
+                publication_date:
+                  type: string
+                  format: date
+                  example: '1925-04-10'
+                genres:
+                  type: string[]
+                  example: ['Fiction']
+                synopsis:
+                  type: string
+                  example: 'A story of decadence and excess...'
+                image_url:
+                  type: string
+                  format: uri
+                  example: 'https://example.com/book-cover.jpg'
+                num_pages:
+                  type: integer
+                  minimum: 1
+                  example: 180
+                publisher:
+                  type: string
+                  example: "Charles Scribner's Sons"
+                reviewValue:
+                  type: number
+                  minimum: 0
+                  maximum: 5
+                  example: 4.5
+      responses:
+        '201':
+          description: Book created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Book created successfully'
+                  book:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      title:
+                        type: string
+                      author:
+                        type: object
+                      publication_date:
+                        type: string
+                        format: date
+                      genre:
+                        type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Validation failed'
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error creating book'
