@@ -83,3 +83,47 @@ export const getBook = async (id: number): Promise<Book | null> => {
   if (!book) return null;
   return book;
 };
+
+/**
+ * Fetches a list of books with optional filters for genres and ordering by publication date.
+ *
+ * @param filters An object containing optional filters for the books.
+ * @param filters.genres An array of genres to filter books (e.g., ['Fiction', 'Non-fiction']).
+ * @param filters.orderByDate A boolean indicating whether to order books by publication date.
+ * @returns A Promise that resolves to an array of books with only the ID and title fields.
+ */
+export const getBooksList = async (
+  filters: {
+    genres?: string[];
+    orderByDate?: boolean;
+  } = {}
+): Promise<{ id: number; title: string }[]> => {
+  try {
+    const { genres, orderByDate } = filters;
+
+    // Build query
+    const query = bookRepository
+      .createQueryBuilder('book')
+      .select(['book.id', 'book.title']);
+
+    // Apply genre filter if provided
+    if (genres && genres.length > 0) {
+      query.andWhere('book.genres && :genres', { genres }); // Checks for overlap in arrays
+    }
+
+    // Apply ordering by publication date if specified
+    if (orderByDate) {
+      query.orderBy('book.publication_date', 'ASC');
+    }
+
+    query.take(10);
+
+    // Execute query
+    const books = await query.getMany();
+
+    return books;
+  } catch (error) {
+    console.error('Error fetching books list:', error);
+    throw new Error('Unable to fetch books list.');
+  }
+};
