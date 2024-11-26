@@ -19,6 +19,7 @@ import {
   ArrayMinSize,
   ArrayMaxSize,
   ArrayNotEmpty,
+  Matches,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { User } from './User';
@@ -78,4 +79,13 @@ export class Book {
 
   @OneToMany(() => Review, (review) => review.book)
   reviews?: Review[];
+
+  @Column({ nullable: true })
+  @Length(10, 13, { message: 'ISBN must be 10 or 13 characters long.' })
+  @Matches(/^\d+$/, { message: 'ISBN must contain only numbers.' })
+  ISBN?: string;
+
+  @Column({ nullable: true })
+  @Length(10, 10, { message: 'ASIN must be exactly 10 characters long.' })
+  ASIN?: string;
 }
