@@ -94,6 +94,7 @@ export const getReviewsByBook = async (
     });
     return { reviews };
   } catch (error) {
+    console.error('Error fetching reviews:', error);
     return { reviews: null, error: 'Error fetching reviews' };
   }
 };
@@ -115,6 +116,7 @@ export const getReviewsByUser = async (
     });
     return { reviews };
   } catch (error) {
+    console.error('Error fetching reviews:', error);
     return { reviews: null, error: 'Error fetching reviews' };
   }
 };
@@ -133,6 +135,7 @@ export const deleteReview = async (
     const result = await reviewRepository.delete(reviewId);
     return { success: result.affected ? result.affected > 0 : false };
   } catch (error) {
+    console.error('Error deleting review:', error);
     return { success: false, error: 'Error deleting review' };
   }
 };

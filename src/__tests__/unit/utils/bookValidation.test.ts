@@ -36,7 +36,8 @@ describe('Book Validation', () => {
     });
 
     it('should fail when title is missing', () => {
-      const { title, ...bookWithoutTitle } = validBookData;
+      const bookWithoutTitle = { ...validBookData };
+      delete bookWithoutTitle.title;
       const result = validateBookInput(bookWithoutTitle);
 
       expect(result.isValid).toBe(false);
@@ -44,7 +45,8 @@ describe('Book Validation', () => {
     });
 
     it('should fail when genres is missing', () => {
-      const { genres, ...bookWithoutGenres } = validBookData;
+      const bookWithoutGenres = { ...validBookData };
+      delete bookWithoutGenres.genres;
       const result = validateBookInput(bookWithoutGenres);
 
       expect(result.isValid).toBe(false);
@@ -52,7 +54,8 @@ describe('Book Validation', () => {
     });
 
     it('should fail when publication_date is missing', () => {
-      const { publication_date, ...bookWithoutDate } = validBookData;
+      const bookWithoutDate = { ...validBookData };
+      delete bookWithoutDate.publication_date;
       const result = validateBookInput(bookWithoutDate);
 
       expect(result.isValid).toBe(false);
@@ -60,7 +63,8 @@ describe('Book Validation', () => {
     });
 
     it('should fail when author is missing', () => {
-      const { author, ...bookWithoutAuthor } = validBookData;
+      const bookWithoutAuthor = { ...validBookData };
+      delete bookWithoutAuthor.author;
       const result = validateBookInput(bookWithoutAuthor);
 
       expect(result.isValid).toBe(false);
@@ -114,7 +118,8 @@ describe('Book Validation', () => {
     });
 
     it('should accept undefined image URL', () => {
-      const { image_url, ...bookWithoutImage } = validBookData;
+      const bookWithoutImage = { ...validBookData };
+      delete bookWithoutImage.image_url;
       const result = validateBookInput(bookWithoutImage);
 
       expect(result.isValid).toBe(true);
@@ -232,14 +237,12 @@ describe('Book Validation', () => {
     });
 
     it('should accept undefined optional fields', () => {
-      const {
-        publisher,
-        image_url,
-        num_pages,
-        reviewValue,
-        synopsis,
-        ...requiredFields
-      } = validBookData;
+      const requiredFields = {
+        title: validBookData.title,
+        author: validBookData.author,
+        publication_date: validBookData.publication_date,
+        genres: validBookData.genres
+      };
 
       const result = validateBookInput(requiredFields);
       expect(result.isValid).toBe(true);

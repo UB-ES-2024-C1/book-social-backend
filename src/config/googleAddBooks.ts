@@ -1,6 +1,5 @@
 import { AppDataSource } from '../config/database';
 import { Book } from '../entities/Book';
-import { User } from '../entities/User';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -52,12 +51,12 @@ async function fetchBooksFromGoogle(query: string) {
   return data.items || [];
 }
 
-function mapGoogleBookToEntity(googleBook: any): Book {
+function mapGoogleBookToEntity(googleBook: GoogleBook): Book {
   // Extract the array of industry identifiers
   const industryIdentifiers = googleBook.volumeInfo.industryIdentifiers;
   const book = new Book();
   book.title = googleBook.volumeInfo.title || 'Unknown Title';
-  book.author = googleBook.volumeInfo.authors[0] || 'Unknown Author';
+  book.author = googleBook.volumeInfo.authors?.[0] || 'Unknown Author';
   book.synopsis = googleBook.volumeInfo.description || null;
   book.image_url = googleBook.volumeInfo.imageLinks?.thumbnail || null;
   book.publication_date = googleBook.volumeInfo.publishedDate
@@ -75,7 +74,7 @@ function mapGoogleBookToEntity(googleBook: any): Book {
   return book;
 }
 
-function booksToJSON(googleBooks: GoogleBook[], genre: string): any[] {
+function booksToJSON(googleBooks: GoogleBook[], genre: string): Record<string, unknown>[] {
   return googleBooks.map((book) => {
     const { volumeInfo } = book;
 
@@ -104,7 +103,7 @@ function booksToJSON(googleBooks: GoogleBook[], genre: string): any[] {
   });
 }
 
-async function saveBooksToDatabase(booksData: any[]) {
+async function saveBooksToDatabase(booksData: GoogleBook[]) {
   const books = booksData.map(mapGoogleBookToEntity);
 
   await bookRepository.save(books);

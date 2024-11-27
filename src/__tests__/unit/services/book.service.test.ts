@@ -4,6 +4,7 @@ import { User } from '../../../entities/User';
 import { UserRole } from '../../../entities/User';
 import { createBook } from '../../../services/book.service';
 import { validate } from 'class-validator';
+import { Repository } from 'typeorm';
 
 // Mock de las dependencias
 jest.mock('../../../config/database', () => ({
@@ -17,8 +18,8 @@ jest.mock('class-validator', () => ({
 }));
 
 describe('Book Service', () => {
-  let bookRepositoryMock: any;
-  let userRepositoryMock: any;
+  let bookRepositoryMock: jest.Mocked<Repository<Book>>;
+  let userRepositoryMock: jest.Mocked<Repository<User>>;
   let mockUser: User;
   let mockBook: Partial<Book>;
 
@@ -53,11 +54,11 @@ describe('Book Service', () => {
     bookRepositoryMock = {
       save: jest.fn(),
       create: jest.fn(),
-    };
+    } as unknown as jest.Mocked<Repository<Book>>;
 
     userRepositoryMock = {
       findOne: jest.fn(),
-    };
+    } as unknown as jest.Mocked<Repository<User>>;
 
     (AppDataSource.getRepository as jest.Mock)
       .mockReturnValueOnce(bookRepositoryMock)
@@ -143,7 +144,8 @@ describe('Book Service', () => {
       bookRepositoryMock.save.mockResolvedValue({ id: 1, ...mockBook });
 
       // Creamos un objeto que omite el autor
-      const { author, ...bookWithoutAuthor } = mockBook;
+      const bookWithoutAuthor = { ...mockBook };
+      delete bookWithoutAuthor.author;
 
       // Creamos un nuevo objeto con el ID del autor
       const bookInput = {
@@ -162,7 +164,8 @@ describe('Book Service', () => {
 
     describe('Edge Cases', () => {
       it('should handle undefined author', async () => {
-        const { author, ...bookWithoutAuthor } = mockBook;
+        const bookWithoutAuthor = { ...mockBook };
+        delete bookWithoutAuthor.author;
         const result = await createBook(bookWithoutAuthor);
 
         expect(result.book).toBeNull();
@@ -170,7 +173,8 @@ describe('Book Service', () => {
       });
 
       it('should handle invalid author id format', async () => {
-        const { author, ...bookWithoutAuthor } = mockBook;
+        const bookWithoutAuthor = { ...mockBook };
+        delete bookWithoutAuthor.author;
 
         // Usamos unknown como tipo intermedio
         const invalidBookData = {

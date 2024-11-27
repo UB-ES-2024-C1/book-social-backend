@@ -58,8 +58,7 @@ export const createBook = async (
     }
 
     // Assign rest of the properties
-    const { author, ...restBookData } = bookData;
-    Object.assign(book, restBookData);
+    Object.assign(book, bookData);
 
     // Validate entity
     const errors = await validate(book);

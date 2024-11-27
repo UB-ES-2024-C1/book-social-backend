@@ -85,6 +85,7 @@ export const registerUser = async (
     const savedUser = await userRepository.save(user);
     return { user: savedUser };
   } catch (error) {
+    console.error('Error saving user to database:', error);
     return { user: null, error: 'Error saving user to database' };
   }
 };
