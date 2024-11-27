@@ -43,8 +43,7 @@ describe('Book Controller - getBookInfo', () => {
       author: { firstName: 'John', lastName: 'Doe' },
       publication_date: new Date('2020-01-01'),
       genres: ['Fiction'],
-      isbn: '9780156031448',
-      asin: '0156031442',
+      ISBN: '9780156031448',
       image_url: 'http://example.com/image.jpg',
       synopsis: 'This is a mock book synopsis.',
     };
@@ -55,8 +54,7 @@ describe('Book Controller - getBookInfo', () => {
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
-      ISBN: mockBook.isbn,
-      ASIN: mockBook.asin,
+      ISBN: mockBook.ISBN,
       language: 'English',
       published: mockBook.publication_date.toDateString(),
       edition: 'First edition',

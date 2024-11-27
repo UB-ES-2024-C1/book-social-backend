@@ -95,10 +95,6 @@ export class Book {
   @Matches(/^\d+$/, { message: 'ISBN must contain only numbers.' })
   ISBN?: string;
 
-  @Column({ nullable: true })
-  @Length(10, 10, { message: 'ASIN must be exactly 10 characters long.' })
-  ASIN?: string;
-
   @Column({ length: 50, nullable: true })
   @Length(1, 50, { message: 'Edition must be between 1 and 50 characters.' })
   edition?: string;
