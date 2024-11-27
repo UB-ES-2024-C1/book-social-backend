@@ -18,6 +18,13 @@ interface GoogleBook {
     categories?: string[];
     pageCount?: number;
     publisher?: string;
+    industryIdentifiers?: {
+      type: string; // e.g., "ISBN_10" or "ISBN_13"
+      identifier: string; // e.g., "9780553804577"
+    }[];
+    averageRating?: number;
+    ratingsCount?: number;
+    language?: string;
   };
 }
 
@@ -40,12 +47,14 @@ async function fetchBooksFromGoogle(query: string) {
   console.log('response', response);
 
   const data = (await response.json()) as GoogleBooksAPIResponse;
-  //console.log(JSON.stringify(data, null, 2));
+  console.log(JSON.stringify(data, null, 2));
 
   return data.items || [];
 }
 
 function mapGoogleBookToEntity(googleBook: any): Book {
+  // Extract the array of industry identifiers
+  const industryIdentifiers = googleBook.volumeInfo.industryIdentifiers;
   const book = new Book();
   book.title = googleBook.volumeInfo.title || 'Unknown Title';
   book.author = googleBook.volumeInfo.authors[0] || 'Unknown Author';
@@ -58,22 +67,41 @@ function mapGoogleBookToEntity(googleBook: any): Book {
   book.num_pages = googleBook.volumeInfo.pageCount || null;
   book.publisher = googleBook.volumeInfo.publisher || null;
 
+  // Prioritize ISBN_13, then fallback to ISBN_10, or leave empty
+  book.ISBN = industryIdentifiers?.length
+    ? industryIdentifiers[0].identifier // Pick the first identifier if available
+    : ''; // Leave it empty if the array doesn't exist or is empty
+
   return book;
 }
 
-function booksToJSON(googleBooks: GoogleBook[]): any[] {
-  return googleBooks.map((book) => ({
-    title: book.volumeInfo.title || 'Unknown Title',
-    author_name: book.volumeInfo.authors?.[0] || 'Unknown Author',
-    synopsis: book.volumeInfo.description || null,
-    image_url: book.volumeInfo.imageLinks?.thumbnail || null,
-    publication_date: book.volumeInfo.publishedDate
-      ? new Date(book.volumeInfo.publishedDate)
-      : new Date(),
-    genres: ['Fiction'],
-    num_pages: book.volumeInfo.pageCount || null,
-    publisher: book.volumeInfo.publisher || 'Unknown Publisher',
-  }));
+function booksToJSON(googleBooks: GoogleBook[], genre: string): any[] {
+  return googleBooks.map((book) => {
+    const { volumeInfo } = book;
+
+    // Safely handle industryIdentifiers
+    const ISBN =
+      volumeInfo.industryIdentifiers?.find((id) => id.type === 'ISBN_13')
+        ?.identifier || ''; // Default to an empty string if none are available
+
+    return {
+      title: volumeInfo.title || 'Unknown Title',
+      author_name: volumeInfo.authors?.[0] || 'Unknown Author',
+      synopsis: volumeInfo.description || null,
+      image_url: volumeInfo.imageLinks?.thumbnail || null,
+      publication_date: volumeInfo.publishedDate
+        ? new Date(volumeInfo.publishedDate)
+        : new Date(), // Default to the current date if not available
+      genres: [genre], // Use categories if available, default to ["Fiction"]
+      num_pages: volumeInfo.pageCount || null,
+      publisher: volumeInfo.publisher || 'Unknown Publisher',
+      ISBN,
+      language: volumeInfo.language || 'en', // Default to English if not available
+      categories: volumeInfo.categories,
+      reviewValue: volumeInfo.averageRating || null,
+      ratingCount: volumeInfo.ratingsCount || null,
+    };
+  });
 }
 
 async function saveBooksToDatabase(booksData: any[]) {
@@ -95,14 +123,18 @@ export async function migrateBooks(query: string) {
   }
 }
 
-export async function saveBooksToFile(query: string, fileName: string) {
+export async function saveBooksToFile(
+  query: string,
+  fileName: string,
+  genre: string
+) {
   const filePath = path.resolve(__dirname, fileName);
   try {
     const googleBooks = await fetchBooksFromGoogle(query);
     console.log(
       `${googleBooks.length} books have been fetched from Google Books API.`
     );
-    const booksJSON = booksToJSON(googleBooks);
+    const booksJSON = booksToJSON(googleBooks, genre);
     await fs.writeFile(filePath, JSON.stringify(booksJSON, null, 2), 'utf-8');
     console.log(`Books data has been saved to ${filePath}`);
   } catch (error) {
@@ -110,9 +142,25 @@ export async function saveBooksToFile(query: string, fileName: string) {
   }
 }
 
+// List of genres and their corresponding file paths
+const genres = [
+  'Fiction',
+  'Nonfiction',
+  'Poetry',
+  'Science',
+  'Nature',
+  'Fantasy',
+  'Theatre',
+  'Romance',
+  'Comedy',
+];
+
 (async function () {
   try {
-    saveBooksToFile('love', './books.json');
+    for (const genre of genres) {
+      const filePath = `./data/${genre.toLowerCase()}.json`; // Example: './data/fiction.json'
+      await saveBooksToFile(genre, filePath, genre);
+    }
   } catch (error) {
     console.error('Error migrating books:', error);
   }

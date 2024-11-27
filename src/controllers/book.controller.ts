@@ -26,7 +26,6 @@ export const getBookInfo = async (
       : 'Unknown Author';
     const bookData = {
       ISBN: book.ISBN,
-      ASIN: book.ASIN,
       language: 'English',
       published: new Date(book.publication_date).toDateString(),
       edition: 'First edition',

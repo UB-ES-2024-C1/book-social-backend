@@ -1,4 +1,5 @@
 # book-social-backend
+
 BookSocial Backend
 
 ## Development Environment Setup Guide
@@ -40,31 +41,37 @@ psql --version
 In this step, we configure PostgreSQL for our BookSocial application.
 
 1. Start the PostgreSQL service:
+
    ```bash
    sudo systemctl start postgresql
    ```
 
 2. Enable PostgreSQL to start on boot:
+
    ```bash
    sudo systemctl enable postgresql
    ```
 
 3. Access the PostgreSQL command line as the postgres user:
+
    ```bash
    sudo -u postgres psql
    ```
 
 4. Create a new user for our application:
+
    ```sql
    CREATE USER book_social_user WITH PASSWORD 'book_social';
    ```
 
 5. Create a new database for our application:
+
    ```sql
    CREATE DATABASE book_social_psql;
    ```
 
 6. Grant all privileges on the new database to our new user:
+
    ```sql
    GRANT ALL PRIVILEGES ON DATABASE book_social_psql TO book_social_user;
    ```
@@ -95,11 +102,13 @@ DB_USERNAME=your_username
 DB_PASSWORD=your_password
 DB_DATABASE=your_database_name
 ```
+
 #### 7. Available Scripts
 
 The project includes several PNPM scripts for different tasks:
 
 **Development and Build:**
+
 ```bash
 # Start the server in production mode
 pnpm start
@@ -112,6 +121,7 @@ pnpm build
 ```
 
 **Testing:**
+
 ```bash
 # Run all tests
 pnpm test
@@ -133,11 +143,13 @@ pnpm test:ci
 ```
 
 The coverage reports are generated in the `coverage/` directory and include:
+
 - Summary in console (text-summary)
 - Interactive HTML report
 - Additional formats (lcov, clover, json) for integration with tools
 
 **Code Quality:**
+
 ```bash
 # Run the linter to check the code
 pnpm lint
@@ -151,6 +163,7 @@ pnpm format
 
 **Coverage Thresholds:**
 The project maintains strict quality standards with minimum coverage thresholds:
+
 - Branches: 80%
 - Functions: 80%
 - Lines: 80%
@@ -165,6 +178,7 @@ http://localhost:3000/api-docs
 ```
 
 This interactive documentation allows you to:
+
 - Browse all available API endpoints
 - See detailed request/response schemas
 - Test API endpoints directly from the browser
@@ -175,16 +189,19 @@ This interactive documentation allows you to:
 The project uses a combination of tools to maintain code quality:
 
 **ESLint:**
+
 - Configured with specific rules for TypeScript
 - Integrated with Prettier to avoid conflicts
 - Custom rules in `.eslintrc`
 
 **Prettier:**
+
 - Consistent code formatting
 - Configuration in `.prettierrc`
 - Ignored files in `.prettierignore`
 
 **Recommended Workflow:**
+
 1. Use `pnpm format` before commits
 2. Run `pnpm lint` to check for issues
 3. Use `pnpm lint:fix` for automatic fixes
@@ -219,3 +236,15 @@ config/
 #### 11. TypeORM Configuration
 
 This project uses TypeORM for database operations. The TypeORM configuration can be found in `src/config/database.ts`. To create new entities (Tables), add them to the `src/entities` directory.
+
+#### 12. Add books from GoogleAPI
+
+In `src/config` there is two scripts `addGoogleBooks.ts` and `database_dumb.ts`. The first saves a json of 10 books, the second reads the json and adds this books to the database.
+
+To run them:
+
+```
+pnpm run build
+node addGoogleBooks.js
+node database_dumb.js
+```
