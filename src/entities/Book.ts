@@ -55,6 +55,11 @@ export class Book {
   @ArrayMaxSize(10, { message: 'Genre cannot contain more than 10 items' })
   genres!: string[];
 
+  @Column('text', { array: true, nullable: true })
+  @IsArray({ message: 'Categories must be an array of strings' })
+  @ArrayMaxSize(10, { message: 'Categories cannot contain more than 10 items' })
+  categories?: string[];
+
   @Column('text', { nullable: true })
   synopsis?: string;
 
@@ -77,6 +82,11 @@ export class Book {
   @Max(5, { message: 'Review value must be at most 5' })
   reviewValue?: number;
 
+  @Column({ type: 'int', nullable: true })
+  @IsInt({ message: 'Rating count must be an integer' })
+  @Min(0, { message: 'Rating count cannot be negative' })
+  ratingCount?: number;
+
   @OneToMany(() => Review, (review) => review.book)
   reviews?: Review[];
 
@@ -88,4 +98,12 @@ export class Book {
   @Column({ nullable: true })
   @Length(10, 10, { message: 'ASIN must be exactly 10 characters long.' })
   ASIN?: string;
+
+  @Column({ length: 50, nullable: true })
+  @Length(1, 50, { message: 'Edition must be between 1 and 50 characters.' })
+  edition?: string;
+
+  @Column({ length: 50, nullable: true })
+  @Length(2, 50, { message: 'Language must be between 2 and 50 characters.' })
+  language?: string;
 }

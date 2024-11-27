@@ -241,4 +241,10 @@ This project uses TypeORM for database operations. The TypeORM configuration can
 
 In `src/config` there is two scripts `addGoogleBooks.ts` and `database_dumb.ts`. The first saves a json of 10 books, the second reads the json and adds this books to the database.
 
-To run them, `pnpm run build`, `node addGoogleBooks.js`, `node database_dumb.js`
+To run them:
+
+```
+pnpm run build
+node addGoogleBooks.js
+node database_dumb.js
+```
