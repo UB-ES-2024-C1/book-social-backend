@@ -56,15 +56,15 @@ function mapGoogleBookToEntity(googleBook: GoogleBook): Book {
   const industryIdentifiers = googleBook.volumeInfo.industryIdentifiers;
   const book = new Book();
   book.title = googleBook.volumeInfo.title || 'Unknown Title';
-  book.author = googleBook.volumeInfo.authors?.[0] || 'Unknown Author';
-  book.synopsis = googleBook.volumeInfo.description || null;
-  book.image_url = googleBook.volumeInfo.imageLinks?.thumbnail || null;
+  //book.author = googleBook.volumeInfo.authors?.[0] || 'Unknown Author';
+  book.synopsis = googleBook.volumeInfo.description || undefined;
+  book.image_url = googleBook.volumeInfo.imageLinks?.thumbnail || undefined;
   book.publication_date = googleBook.volumeInfo.publishedDate
     ? new Date(googleBook.volumeInfo.publishedDate)
     : new Date();
   book.genres = ['Non-fiction'];
-  book.num_pages = googleBook.volumeInfo.pageCount || null;
-  book.publisher = googleBook.volumeInfo.publisher || null;
+  book.num_pages = googleBook.volumeInfo.pageCount || undefined;
+  book.publisher = googleBook.volumeInfo.publisher || undefined;
 
   // Prioritize ISBN_13, then fallback to ISBN_10, or leave empty
   book.ISBN = industryIdentifiers?.length
