@@ -49,7 +49,7 @@ export const getByBook = async (
 ) => {
   try {
     const bookId = parseInt(req.params.bookId);
-    
+
     if (isNaN(bookId)) {
       res.status(400).json({ message: 'Invalid book ID' });
       return;

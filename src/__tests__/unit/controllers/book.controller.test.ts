@@ -6,7 +6,12 @@ import * as bookService from '../../../services/book.service';
 import * as bookValidation from '../../../utils/bookValidation';
 
 jest.mock('../../../services/book.service', () => ({
+  createBook: jest.fn(),
   getBook: jest.fn(),
+}));
+
+jest.mock('../../../utils/bookValidation', () => ({
+  validateBookInput: jest.fn(),
 }));
 
 describe('Book Controller - getBookInfo', () => {

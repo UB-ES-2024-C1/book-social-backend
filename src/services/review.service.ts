@@ -24,14 +24,15 @@ export const createReview = async (
 
     // Validate user exists
     if (reviewData.user) {
-      const userId = typeof reviewData.user === 'number' 
-        ? reviewData.user 
-        : (reviewData.user as User).id;
-      
+      const userId =
+        typeof reviewData.user === 'number'
+          ? reviewData.user
+          : (reviewData.user as User).id;
+
       const user = await userRepository.findOne({
         where: { id: userId },
       });
-      
+
       if (!user) {
         return { review: null, error: 'User not found' };
       }
@@ -40,14 +41,15 @@ export const createReview = async (
 
     // Validate book exists
     if (reviewData.book) {
-      const bookId = typeof reviewData.book === 'number'
-        ? reviewData.book
-        : (reviewData.book as Book).id;
-      
+      const bookId =
+        typeof reviewData.book === 'number'
+          ? reviewData.book
+          : (reviewData.book as Book).id;
+
       const book = await bookRepository.findOne({
         where: { id: bookId },
       });
-      
+
       if (!book) {
         return { review: null, error: 'Book not found' };
       }
