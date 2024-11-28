@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { getBook, getBooksList } from '../services/book.service';
 import { createBook } from '../services/book.service';
 import { validateBookInput } from '../utils/bookValidation';
@@ -90,7 +90,6 @@ export const create = async (req: Request, res: Response) => {
 export const getListOfBooks = async (
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   try {
     // Fetch all books
@@ -98,6 +97,7 @@ export const getListOfBooks = async (
     // Respond with the list of books
     res.status(200).json(books);
   } catch (error) {
+    console.log(error)
     res.status(500).json({
       error: 'An error occurred while fetching the list of books.',
     });
