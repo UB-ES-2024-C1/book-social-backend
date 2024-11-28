@@ -144,10 +144,7 @@ describe('Book Controller', () => {
       });
 
       it('should create a book and return 201 status', async () => {
-        await create(
-          mockRequest as Request,
-          mockResponse as Response
-        );
+        await create(mockRequest as Request, mockResponse as Response);
 
         expect(mockResponse.status).toHaveBeenCalledWith(201);
         expect(mockResponse.json).toHaveBeenCalledWith({
@@ -160,10 +157,7 @@ describe('Book Controller', () => {
       });
 
       it('should call the validation service with correct data', async () => {
-        await create(
-          mockRequest as Request,
-          mockResponse as Response
-        );
+        await create(mockRequest as Request, mockResponse as Response);
 
         expect(bookValidation.validateBookInput).toHaveBeenCalledWith(
           mockRequest.body
@@ -180,10 +174,7 @@ describe('Book Controller', () => {
       });
 
       it('should return 400 status with validation errors', async () => {
-        await create(
-          mockRequest as Request,
-          mockResponse as Response
-        );
+        await create(mockRequest as Request, mockResponse as Response);
 
         expect(mockResponse.status).toHaveBeenCalledWith(400);
         expect(mockResponse.json).toHaveBeenCalledWith({
@@ -193,10 +184,7 @@ describe('Book Controller', () => {
       });
 
       it('should not call createBook service if validation fails', async () => {
-        await create(
-          mockRequest as Request,
-          mockResponse as Response
-        );
+        await create(mockRequest as Request, mockResponse as Response);
 
         expect(bookService.createBook).not.toHaveBeenCalled();
       });
@@ -216,10 +204,7 @@ describe('Book Controller', () => {
       });
 
       it('should return 400 status when service fails with error message', async () => {
-        await create(
-          mockRequest as Request,
-          mockResponse as Response
-        );
+        await create(mockRequest as Request, mockResponse as Response);
 
         expect(mockResponse.status).toHaveBeenCalledWith(400);
         expect(mockResponse.json).toHaveBeenCalledWith({
@@ -241,10 +226,7 @@ describe('Book Controller', () => {
       });
 
       it('should return 500 status on unexpected errors', async () => {
-        await create(
-          mockRequest as Request,
-          mockResponse as Response
-        );
+        await create(mockRequest as Request, mockResponse as Response);
 
         expect(mockResponse.status).toHaveBeenCalledWith(500);
         expect(mockResponse.json).toHaveBeenCalledWith({
@@ -257,10 +239,7 @@ describe('Book Controller', () => {
         const mockError = new Error('Unexpected service error');
         (bookService.createBook as jest.Mock).mockRejectedValue(mockError);
 
-        await create(
-          mockRequest as Request,
-          mockResponse as Response
-        );
+        await create(mockRequest as Request, mockResponse as Response);
 
         expect(mockResponse.status).toHaveBeenCalledWith(500);
         expect(mockResponse.json).toHaveBeenCalledWith({
@@ -279,10 +258,7 @@ describe('Book Controller', () => {
           errors: ['Required fields missing'],
         });
 
-        await create(
-          mockRequest as Request,
-          mockResponse as Response
-        );
+        await create(mockRequest as Request, mockResponse as Response);
 
         expect(mockResponse.status).toHaveBeenCalledWith(400);
         expect(mockResponse.json).toHaveBeenCalledWith({
@@ -294,10 +270,7 @@ describe('Book Controller', () => {
       it('should handle null request body', async () => {
         mockRequest.body = null;
 
-        await create(
-          mockRequest as Request,
-          mockResponse as Response
-        );
+        await create(mockRequest as Request, mockResponse as Response);
 
         expect(mockResponse.status).toHaveBeenCalledWith(400);
         expect(mockResponse.json).toHaveBeenCalledWith({

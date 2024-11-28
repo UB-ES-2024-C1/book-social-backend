@@ -3,10 +3,7 @@ import { getBook } from '../services/book.service';
 import { createBook } from '../services/book.service';
 import { validateBookInput } from '../utils/bookValidation';
 
-export const getBookInfo = async (
-  req: Request,
-  res: Response
-) => {
+export const getBookInfo = async (req: Request, res: Response) => {
   try {
     const bookId = req.params.id; // Retrieve the `id` from the route parameter
 
@@ -61,10 +58,7 @@ export const getBookInfo = async (
  * @param req - The Express request object.
  * @param res - The Express response object.
  */
-export const create = async (
-  req: Request,
-  res: Response
-) => {
+export const create = async (req: Request, res: Response) => {
   try {
     const validation = validateBookInput(req.body);
 

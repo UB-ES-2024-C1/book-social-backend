@@ -12,10 +12,7 @@ import {
  * @param req - The Express request object.
  * @param res - The Express response object.
  */
-export const create = async (
-  req: Request,
-  res: Response
-) => {
+export const create = async (req: Request, res: Response) => {
   try {
     const result = await createReview(req.body);
 
@@ -39,10 +36,7 @@ export const create = async (
  * @param req - The Express request object.
  * @param res - The Express response object.
  */
-export const getByBook = async (
-  req: Request,
-  res: Response
-) => {
+export const getByBook = async (req: Request, res: Response) => {
   try {
     const bookId = parseInt(req.params.bookId);
 
@@ -70,10 +64,7 @@ export const getByBook = async (
  * @param req - The Express request object.
  * @param res - The Express response object.
  */
-export const getByUser = async (
-  req: Request,
-  res: Response
-) => {
+export const getByUser = async (req: Request, res: Response) => {
   try {
     const userId = parseInt(req.params.userId);
 
@@ -101,10 +92,7 @@ export const getByUser = async (
  * @param req - The Express request object.
  * @param res - The Express response object.
  */
-export const remove = async (
-  req: Request,
-  res: Response
-) => {
+export const remove = async (req: Request, res: Response) => {
   try {
     const reviewId = parseInt(req.params.reviewId);
 

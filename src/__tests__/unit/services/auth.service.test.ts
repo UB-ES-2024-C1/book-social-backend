@@ -32,7 +32,9 @@ describe('Auth Service', () => {
       password: await bcrypt.hash('ValidPass1!', 10),
     } as User;
 
-    userRepositoryMock = AppDataSource.getRepository(User) as jest.Mocked<Repository<User>>;
+    userRepositoryMock = AppDataSource.getRepository(User) as jest.Mocked<
+      Repository<User>
+    >;
     userRepositoryMock.findOne.mockReset();
   });
 

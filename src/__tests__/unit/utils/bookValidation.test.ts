@@ -241,7 +241,7 @@ describe('Book Validation', () => {
         title: validBookData.title,
         author: validBookData.author,
         publication_date: validBookData.publication_date,
-        genres: validBookData.genres
+        genres: validBookData.genres,
       };
 
       const result = validateBookInput(requiredFields);

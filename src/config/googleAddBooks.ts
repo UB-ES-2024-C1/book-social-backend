@@ -74,7 +74,10 @@ function mapGoogleBookToEntity(googleBook: GoogleBook): Book {
   return book;
 }
 
-function booksToJSON(googleBooks: GoogleBook[], genre: string): Record<string, unknown>[] {
+function booksToJSON(
+  googleBooks: GoogleBook[],
+  genre: string
+): Record<string, unknown>[] {
   return googleBooks.map((book) => {
     const { volumeInfo } = book;
 
