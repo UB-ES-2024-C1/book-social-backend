@@ -104,8 +104,20 @@ export const getBooksList = async (
     // Build query
     const query = bookRepository
       .createQueryBuilder('book')
-      .select(['book.id', 'book.title']);
-
+      .leftJoin('book.author', 'author')
+      .select([
+        'book.id',
+        'book.title',
+        'book.synopsis',
+        'book.reviewValue',
+        'book.image_url',
+        'book.genres',
+        'book.publication_date',
+      ])
+      .addSelect(
+        "CONCAT(author.firstName, ' ', author.lastName)",
+        'authorName'
+      );
     // Apply genre filter if provided
     if (genres && genres.length > 0) {
       query.andWhere('book.genres && :genres', { genres }); // Checks for overlap in arrays
