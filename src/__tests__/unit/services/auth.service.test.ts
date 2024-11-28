@@ -3,6 +3,7 @@ import { User } from '../../../entities/User';
 import { loginUser, registerUser } from '../../../services/auth.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { Repository } from 'typeorm';
 
 // Mock the database connection
 jest.mock('../../../config/database', () => ({
@@ -16,7 +17,7 @@ jest.mock('../../../config/database', () => ({
 }));
 
 describe('Auth Service', () => {
-  let userRepositoryMock: any;
+  let userRepositoryMock: jest.Mocked<Repository<User>>;
   let mockUser: User;
 
   beforeEach(async () => {
@@ -31,7 +32,7 @@ describe('Auth Service', () => {
       password: await bcrypt.hash('ValidPass1!', 10),
     } as User;
 
-    userRepositoryMock = AppDataSource.getRepository(User);
+    userRepositoryMock = AppDataSource.getRepository(User) as jest.Mocked<Repository<User>>;
     userRepositoryMock.findOne.mockReset();
   });
 

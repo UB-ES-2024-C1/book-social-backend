@@ -1,5 +1,6 @@
 import { login, register } from '../../../controllers/auth.controller';
-import { loginUser, registerUser } from '../../../services/auth.service';
+import { registerUser, loginUser } from '../../../services/auth.service';
+import { Request, Response } from 'express';
 
 // Mock the auth service
 jest.mock('../../../services/auth.service', () => ({
@@ -8,9 +9,8 @@ jest.mock('../../../services/auth.service', () => ({
 }));
 
 describe('Auth Controller - Login', () => {
-  let req: any;
-  let res: any;
-  let next: jest.Mock;
+  let req: Partial<Request>;
+  let res: Partial<Response>;
 
   beforeEach(() => {
     req = {
@@ -20,16 +20,13 @@ describe('Auth Controller - Login', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
-    next = jest.fn();
   });
 
   it('should return 401 for invalid credentials', async () => {
     req.body = { email: 'john@example.com', password: 'ValidPass1!' };
-    jest
-      .spyOn(require('../../../services/auth.service'), 'loginUser')
-      .mockResolvedValue(null);
+    jest.spyOn({ loginUser }, 'loginUser').mockResolvedValue(null);
 
-    await login(req, res, next);
+    await login(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({ message: 'Invalid credentials' });
@@ -38,11 +35,9 @@ describe('Auth Controller - Login', () => {
   it('should return 200 and token for valid credentials', async () => {
     req.body = { email: 'john.doe@example.com', password: 'ValidPass1!' };
     const mockToken = 'mockjwttoken';
-    jest
-      .spyOn(require('../../../services/auth.service'), 'loginUser')
-      .mockResolvedValue(mockToken);
+    jest.spyOn({ loginUser }, 'loginUser').mockResolvedValue(mockToken);
 
-    await login(req, res, next);
+    await login(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ token: mockToken });
@@ -51,11 +46,9 @@ describe('Auth Controller - Login', () => {
   it('should call next with error on exception', async () => {
     req.body = { email: 'john@example.com', password: 'ValidPass1!' };
     const mockError = new Error('Test error');
-    jest
-      .spyOn(require('../../../services/auth.service'), 'loginUser')
-      .mockRejectedValue(mockError);
+    jest.spyOn({ loginUser }, 'loginUser').mockRejectedValue(mockError);
 
-    await login(req, res, next);
+    await login(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
@@ -67,7 +60,7 @@ describe('Auth Controller - Login', () => {
   it('should return 400 for invalid email format', async () => {
     req.body = { email: 'invalidemail', password: 'ValidPass1!' };
 
-    await login(req, res, next);
+    await login(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
@@ -79,7 +72,7 @@ describe('Auth Controller - Login', () => {
   it('should return 400 for invalid password format', async () => {
     req.body = { email: 'john.doe@example.com', password: 'short' };
 
-    await login(req, res, next);
+    await login(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
@@ -93,7 +86,7 @@ describe('Auth Controller - Login', () => {
   it('should return 400 for both invalid email and password', async () => {
     req.body = { email: 'invalidemail', password: 'short' };
 
-    await login(req, res, next);
+    await login(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
@@ -107,9 +100,8 @@ describe('Auth Controller - Login', () => {
 });
 
 describe('Auth Controller - Register', () => {
-  let req: any;
-  let res: any;
-  let next: jest.Mock;
+  let req: Partial<Request>;
+  let res: Partial<Response>;
 
   beforeEach(() => {
     req = {
@@ -119,13 +111,12 @@ describe('Auth Controller - Register', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
-    next = jest.fn();
   });
 
   it('should return 400 for invalid registration data', async () => {
     req.body = {};
 
-    await register(req, res, next);
+    await register(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
@@ -156,7 +147,7 @@ describe('Auth Controller - Register', () => {
       error: 'Email already exists',
     });
 
-    await register(req, res, next);
+    await register(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
@@ -178,7 +169,7 @@ describe('Auth Controller - Register', () => {
       error: 'Username already exists',
     });
 
-    await register(req, res, next);
+    await register(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
@@ -200,7 +191,7 @@ describe('Auth Controller - Register', () => {
       user: mockUser,
     });
 
-    await register(req, res, next);
+    await register(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
@@ -220,7 +211,7 @@ describe('Auth Controller - Register', () => {
     const mockError = new Error('Test error');
     (registerUser as jest.Mock).mockRejectedValue(mockError);
 
-    await register(req, res, next);
+    await register(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({

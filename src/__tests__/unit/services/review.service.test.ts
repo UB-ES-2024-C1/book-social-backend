@@ -1,4 +1,3 @@
-import { AppDataSource } from '../../../config/database';
 import { Review } from '../../../entities/Review';
 import { User } from '../../../entities/User';
 import { Book } from '../../../entities/Book';

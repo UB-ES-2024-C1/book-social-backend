@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import {
   createReview,
   getReviewsByBook,
@@ -11,12 +11,10 @@ import {
  *
  * @param req - The Express request object.
  * @param res - The Express response object.
- * @param next - The Express next function.
  */
 export const create = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
     const result = await createReview(req.body);
@@ -40,16 +38,14 @@ export const create = async (
  *
  * @param req - The Express request object.
  * @param res - The Express response object.
- * @param next - The Express next function.
  */
 export const getByBook = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
     const bookId = parseInt(req.params.bookId);
-    
+
     if (isNaN(bookId)) {
       res.status(400).json({ message: 'Invalid book ID' });
       return;
@@ -73,12 +69,10 @@ export const getByBook = async (
  *
  * @param req - The Express request object.
  * @param res - The Express response object.
- * @param next - The Express next function.
  */
 export const getByUser = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
     const userId = parseInt(req.params.userId);
@@ -106,12 +100,10 @@ export const getByUser = async (
  *
  * @param req - The Express request object.
  * @param res - The Express response object.
- * @param next - The Express next function.
  */
 export const remove = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
     const reviewId = parseInt(req.params.reviewId);

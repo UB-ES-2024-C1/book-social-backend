@@ -68,7 +68,7 @@ describe('Review Entity', () => {
 
     it('should fail validation when user is missing', async () => {
       const review = new Review();
-      const { user, ...reviewWithoutUser } = validReviewData;
+      const reviewWithoutUser = { ...validReviewData, user: null };
       Object.assign(review, reviewWithoutUser);
       review.created_at = new Date();
 
@@ -86,7 +86,7 @@ describe('Review Entity', () => {
 
     it('should fail validation when book is missing', async () => {
       const review = new Review();
-      const { book, ...reviewWithoutBook } = validReviewData;
+      const reviewWithoutBook = { ...validReviewData, book: null };
       Object.assign(review, reviewWithoutBook);
       review.created_at = new Date();
 
@@ -104,7 +104,7 @@ describe('Review Entity', () => {
 
     it('should fail validation when rating is missing', async () => {
       const review = new Review();
-      const { rating, ...reviewWithoutRating } = validReviewData;
+      const reviewWithoutRating = { ...validReviewData, rating: null };
       Object.assign(review, reviewWithoutRating);
       review.created_at = new Date();
 
@@ -231,4 +231,3 @@ describe('Review Entity', () => {
     });
   });
 });
-

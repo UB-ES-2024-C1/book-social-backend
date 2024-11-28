@@ -3,11 +3,7 @@ import { getBook, getBooksList } from '../services/book.service';
 import { createBook } from '../services/book.service';
 import { validateBookInput } from '../utils/bookValidation';
 
-export const getBookInfo = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getBookInfo = async (req: Request, res: Response) => {
   try {
     const bookId = req.params.id; // Retrieve the `id` from the route parameter
 
@@ -52,7 +48,7 @@ export const getBookInfo = async (
     res.status(200).json(bookData);
   } catch (error) {
     res.status(500).json({
-      error: 'An error occurred while fetching book info.',
+      error: `An error occurred while fetching book info. ${error}`,
     });
   }
 };
@@ -62,13 +58,8 @@ export const getBookInfo = async (
  *
  * @param req - The Express request object.
  * @param res - The Express response object.
- * @param next - The Express next function.
  */
-export const create = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const create = async (req: Request, res: Response) => {
   try {
     const validation = validateBookInput(req.body);
 

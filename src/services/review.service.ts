@@ -24,14 +24,15 @@ export const createReview = async (
 
     // Validate user exists
     if (reviewData.user) {
-      const userId = typeof reviewData.user === 'number' 
-        ? reviewData.user 
-        : (reviewData.user as User).id;
-      
+      const userId =
+        typeof reviewData.user === 'number'
+          ? reviewData.user
+          : (reviewData.user as User).id;
+
       const user = await userRepository.findOne({
         where: { id: userId },
       });
-      
+
       if (!user) {
         return { review: null, error: 'User not found' };
       }
@@ -40,14 +41,15 @@ export const createReview = async (
 
     // Validate book exists
     if (reviewData.book) {
-      const bookId = typeof reviewData.book === 'number'
-        ? reviewData.book
-        : (reviewData.book as Book).id;
-      
+      const bookId =
+        typeof reviewData.book === 'number'
+          ? reviewData.book
+          : (reviewData.book as Book).id;
+
       const book = await bookRepository.findOne({
         where: { id: bookId },
       });
-      
+
       if (!book) {
         return { review: null, error: 'Book not found' };
       }
@@ -92,6 +94,7 @@ export const getReviewsByBook = async (
     });
     return { reviews };
   } catch (error) {
+    console.error('Error fetching reviews:', error);
     return { reviews: null, error: 'Error fetching reviews' };
   }
 };
@@ -113,6 +116,7 @@ export const getReviewsByUser = async (
     });
     return { reviews };
   } catch (error) {
+    console.error('Error fetching reviews:', error);
     return { reviews: null, error: 'Error fetching reviews' };
   }
 };
@@ -131,6 +135,7 @@ export const deleteReview = async (
     const result = await reviewRepository.delete(reviewId);
     return { success: result.affected ? result.affected > 0 : false };
   } catch (error) {
+    console.error('Error deleting review:', error);
     return { success: false, error: 'Error deleting review' };
   }
 };
