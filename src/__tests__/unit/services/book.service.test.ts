@@ -2,7 +2,7 @@ import { AppDataSource } from '../../../config/database';
 import { Book } from '../../../entities/Book';
 import { User } from '../../../entities/User';
 import { UserRole } from '../../../entities/User';
-import { createBook } from '../../../services/book.service';
+import { createBook, getBooksList } from '../../../services/book.service';
 import { validate } from 'class-validator';
 
 // Mock de las dependencias
@@ -201,5 +201,111 @@ describe('Book Service', () => {
         expect(bookRepositoryMock.save).toHaveBeenCalled();
       });
     });
+  });
+});
+
+jest.mock('../../../config/database', () => ({
+  AppDataSource: {
+    getRepository: jest.fn(),
+  },
+}));
+
+describe('getBooksList', () => {
+  let mockBookRepository: jest.Mock;
+
+  beforeEach(() => {
+    mockBookRepository = jest.fn();
+    AppDataSource.getRepository = mockBookRepository;
+  });
+
+  it('should return a filtered list of books by genre and order by date', async () => {
+    // Mock the repository behavior
+    mockBookRepository.mockReturnValue({
+      createQueryBuilder: jest.fn().mockReturnValue({
+        leftJoin: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([
+          {
+            id: 1,
+            title: 'Test Book',
+            synopsis: 'A great book.',
+            reviewValue: 4.5,
+            image_url: 'http://example.com/image.jpg',
+            genres: ['Fiction'],
+            publication_date: new Date('2022-01-01'),
+            authorName: 'John Doe',
+          },
+        ]),
+      }),
+    });
+
+    // Call the service with filters
+    const result = await getBooksList({
+      genres: ['Fiction'],
+      orderByDate: true,
+    });
+
+    expect(result).toEqual([
+      {
+        id: 1,
+        title: 'Test Book',
+        synopsis: 'A great book.',
+        reviewValue: 4.5,
+        image_url: 'http://example.com/image.jpg',
+        genres: ['Fiction'],
+        publication_date: new Date('2022-01-01'),
+        authorName: 'John Doe',
+      },
+    ]);
+  });
+
+  it('should return all books when no filters are applied', async () => {
+    mockBookRepository.mockReturnValue({
+      createQueryBuilder: jest.fn().mockReturnValue({
+        leftJoin: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([
+          {
+            id: 1,
+            title: 'Test Book',
+            synopsis: 'A great book.',
+            reviewValue: 4.5,
+            image_url: 'http://example.com/image.jpg',
+            genres: ['Fiction'],
+            publication_date: new Date('2022-01-01'),
+            authorName: 'John Doe',
+          },
+        ]),
+      }),
+    });
+
+    const result = await getBooksList();
+    expect(result).toEqual([
+      {
+        id: 1,
+        title: 'Test Book',
+        synopsis: 'A great book.',
+        reviewValue: 4.5,
+        image_url: 'http://example.com/image.jpg',
+        genres: ['Fiction'],
+        publication_date: new Date('2022-01-01'),
+        authorName: 'John Doe',
+      },
+    ]);
+  });
+
+  it('should throw an error if the query fails', async () => {
+    mockBookRepository.mockReturnValue({
+      createQueryBuilder: jest.fn().mockReturnValue({
+        getMany: jest.fn().mockRejectedValue(new Error('Query failed')),
+      }),
+    });
+
+    await expect(getBooksList()).rejects.toThrow('Unable to fetch books list.');
   });
 });
