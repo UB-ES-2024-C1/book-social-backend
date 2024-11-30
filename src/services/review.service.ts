@@ -93,8 +93,7 @@ export const getReviewsByBook = async (
       relations: ['user', 'book'],
     });
     return { reviews };
-  } catch (error) {
-    console.error('Error fetching reviews:', error);
+  } catch {
     return { reviews: null, error: 'Error fetching reviews' };
   }
 };

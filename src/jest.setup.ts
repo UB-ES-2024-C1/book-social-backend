@@ -1,10 +1,33 @@
 import 'reflect-metadata';
 
-// Configuración global para los tests
+// Mock class-validator decorators
+jest.mock('class-validator', () => ({
+  IsNotEmpty: () => jest.fn(),
+  Length: () => jest.fn(),
+  IsEmail: () => jest.fn(),
+  MinLength: () => jest.fn(),
+  MaxLength: () => jest.fn(),
+  IsEnum: () => jest.fn(),
+  Matches: () => jest.fn(),
+  IsUrl: () => jest.fn(),
+  IsDate: () => jest.fn(),
+  IsInt: () => jest.fn(),
+  Min: () => jest.fn(),
+  IsNumber: () => jest.fn(),
+  Max: () => jest.fn(),
+  IsArray: () => jest.fn(),
+  ArrayMinSize: () => jest.fn(),
+  ArrayMaxSize: () => jest.fn(),
+  ArrayNotEmpty: () => jest.fn(),
+  IsOptional: () => jest.fn(),
+  validate: jest.fn().mockResolvedValue([]),
+}));
+
+// Global test setup
 beforeAll(() => {
-  // Aquí puedes añadir configuración global que se ejecutará antes de todos los tests
+  // Add any additional setup if needed
 });
 
 afterAll(() => {
-  // Limpieza después de todos los tests
+  // Add any cleanup if needed
 });
