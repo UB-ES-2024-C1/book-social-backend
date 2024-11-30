@@ -116,6 +116,14 @@ paths:
                   format: password
                   example: "ValidPass1!"
                   description: User's password (min 8 chars, must include uppercase, lowercase, number and special char)
+                genre:
+                  type: string
+                  example: "Science Fiction"
+                  description: "User's preferred literary genre"
+                description:
+                  type: string
+                  example: "I love reading and writing science fiction novels..."
+                  description: "Optional user description"
       responses:
         '201':
           description: User successfully registered

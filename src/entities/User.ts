@@ -47,6 +47,19 @@ export class User {
   })
   lastName!: string;
 
+  @Column()
+  @IsNotEmpty({ message: 'Literary genre is required' })
+  @Length(1, 50, {
+    message: 'Literary genre must be between 1 and 50 characters',
+  })
+  genre!: string;
+
+  @Column({ type: 'text', nullable: true })
+  @Length(0, 1000, {
+    message: 'Description must be less than 1000 characters',
+  })
+  description?: string;
+
   @Column({ unique: true })
   @IsNotEmpty({ message: 'Username is required' })
   @MinLength(3, {
