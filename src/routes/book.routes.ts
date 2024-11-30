@@ -8,7 +8,7 @@ import {
 const router = express.Router();
 
 router.get('/book-detail/:id', authenticateToken, getBookInfo);
-
+router.post('/book-list/', authenticateToken, getListOfBooks);
 router.post('/', authenticateToken, requireWriter, create);
 
 export default router;

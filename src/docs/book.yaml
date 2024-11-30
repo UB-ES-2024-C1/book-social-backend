@@ -162,3 +162,64 @@ paths:
                   message:
                     type: string
                     example: 'Error creating book'
+  /books/book-list/:
+    post:
+      summary: Retrieve a list of books
+      description: Fetches a list of books with optional filters for genres and ordering by publication date.
+      tags:
+        - Books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                genres:
+                  type: array
+                  items:
+                    type: string
+                  description: A list of genres to filter books (e.g., Fiction, Non-fiction).
+                  example: ['Fiction', 'Non-fiction']
+                orderByDate:
+                  type: boolean
+                  description: Whether to order books by publication date in ascending order.
+                  example: true
+      responses:
+        200:
+          description: A list of books matching the filters.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: The unique identifier of the book.
+                      example: 1
+                    title:
+                      type: string
+                      description: The title of the book.
+                      example: 'The Great Gatsby'
+        400:
+          description: Invalid request body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Invalid genres parameter.'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'An error occurred while fetching the list of books.'

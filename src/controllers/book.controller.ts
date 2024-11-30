@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getBook } from '../services/book.service';
+import { getBook, getBooksList } from '../services/book.service';
 import { createBook } from '../services/book.service';
 import { validateBookInput } from '../utils/bookValidation';
 
@@ -52,6 +52,7 @@ export const getBookInfo = async (req: Request, res: Response) => {
     });
   }
 };
+
 /**
  * Handles book creation.
  *
@@ -83,5 +84,22 @@ export const create = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ message: 'Error creating book', error });
+  }
+};
+
+export const getListOfBooks = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    // Fetch all books
+    const books = await getBooksList(req.body);
+    // Respond with the list of books
+    res.status(200).json(books);
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      error: 'An error occurred while fetching the list of books.',
+    });
   }
 };
