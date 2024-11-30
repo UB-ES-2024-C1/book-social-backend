@@ -41,14 +41,16 @@ export const login = async (req: Request, res: Response) => {
  */
 export const register = async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, username, email, password, role } = req.body;
+    const { firstName, lastName, username, email, password, genre, description } = req.body;
 
     const validation = validateRegisterInput(
       firstName,
       lastName,
       username,
       email,
-      password
+      password,
+      genre,
+      description
     );
 
     if (!validation.isValid) {
@@ -65,7 +67,8 @@ export const register = async (req: Request, res: Response) => {
       username,
       email,
       password,
-      role
+      genre,
+      description
     );
 
     if (!result.user) {
