@@ -59,6 +59,8 @@ describe('Review Service', () => {
       email: 'john@example.com',
       username: 'johndoe',
       password: 'Password123!',
+      genre: 'Science Fiction',
+      description: 'Test user description',
       role: UserRole.WRITER,
     } as User;
 

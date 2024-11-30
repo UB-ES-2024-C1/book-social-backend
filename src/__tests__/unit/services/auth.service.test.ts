@@ -69,17 +69,29 @@ describe('Auth Service', () => {
   });
 
   describe('Register', () => {
+    const validUserData = {
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'john@example.com',
+      password: 'ValidPass1!',
+      genre: 'Science Fiction',
+      description: 'Test description',
+    };
+
     it('should return error when email already exists', async () => {
       userRepositoryMock.findOne
         .mockResolvedValueOnce(mockUser) // Email check
         .mockResolvedValueOnce(null); // Username check
 
       const result = await registerUser(
-        'John',
-        'Doe',
-        'newusername',
+        validUserData.firstName,
+        validUserData.lastName,
+        validUserData.username,
         'john@example.com',
-        'ValidPass1!'
+        validUserData.password,
+        validUserData.genre,
+        validUserData.description
       );
 
       expect(result).toEqual({
@@ -93,12 +105,20 @@ describe('Auth Service', () => {
         .mockResolvedValueOnce(null) // Email check
         .mockResolvedValueOnce(mockUser); // Username check
 
+      const testData = {
+        ...validUserData,
+        email: 'newemail@example.com', // Different email
+        username: 'johndoe', // Existing username
+      };
+
       const result = await registerUser(
-        'John',
-        'Doe',
-        'johndoe',
-        'newemail@example.com',
-        'ValidPass1!'
+        testData.firstName,
+        testData.lastName,
+        testData.username,
+        testData.email,
+        testData.password,
+        testData.genre,
+        testData.description
       );
 
       expect(userRepositoryMock.findOne).toHaveBeenCalledTimes(2);
@@ -122,11 +142,13 @@ describe('Auth Service', () => {
       userRepositoryMock.save.mockResolvedValue(mockUser);
 
       const result = await registerUser(
-        'John',
-        'Doe',
-        'johndoe',
-        'john@example.com',
-        'ValidPass1!'
+        validUserData.firstName,
+        validUserData.lastName,
+        validUserData.username,
+        validUserData.email,
+        validUserData.password,
+        validUserData.genre,
+        validUserData.description
       );
 
       expect(result).toEqual({
@@ -135,13 +157,84 @@ describe('Auth Service', () => {
       expect(result.user).toHaveProperty('id', 1);
     });
 
+    it('should fail when genre is missing', async () => {
+      const result = await registerUser(
+        validUserData.firstName,
+        validUserData.lastName,
+        validUserData.username,
+        validUserData.email,
+        validUserData.password,
+        '', // empty genre
+        validUserData.description
+      );
+
+      expect(result).toEqual({
+        user: null,
+        error: expect.stringContaining('Literary genre is required'),
+      });
+    });
+
+    it('should succeed when description is missing', async () => {
+      userRepositoryMock.findOne
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null);
+      userRepositoryMock.save.mockResolvedValue({
+        ...mockUser,
+        description: undefined, // Ensure mock saved user has no description
+      });
+
+      const result = await registerUser(
+        validUserData.firstName,
+        validUserData.lastName,
+        validUserData.username,
+        validUserData.email,
+        validUserData.password,
+        validUserData.genre
+        // description intentionally omitted
+      );
+
+      expect(result.user).toBeDefined();
+      expect(result.error).toBeUndefined();
+      expect(userRepositoryMock.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          firstName: validUserData.firstName,
+          lastName: validUserData.lastName,
+          username: validUserData.username,
+          email: validUserData.email,
+          genre: validUserData.genre,
+          description: undefined,
+        })
+      );
+    });
+
+    it('should fail when genre is too long', async () => {
+      const result = await registerUser(
+        validUserData.firstName,
+        validUserData.lastName,
+        validUserData.username,
+        validUserData.email,
+        validUserData.password,
+        'x'.repeat(51), // genre longer than 50 characters
+        validUserData.description
+      );
+
+      expect(result).toEqual({
+        user: null,
+        error: expect.stringContaining(
+          'Literary genre must be between 1 and 50 characters'
+        ),
+      });
+    });
+
     it('should return error for invalid password format', async () => {
       const result = await registerUser(
         'John',
         'Doe',
         'johndoe',
         'john@example.com',
-        'weakpass'
+        'weakpass',
+        validUserData.genre,
+        validUserData.description
       );
 
       expect(result).toEqual({

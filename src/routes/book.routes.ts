@@ -30,8 +30,20 @@ router.get('/book-list', authenticateToken, getListOfBooks);
 router.post('/', authenticateToken, requireWriter, create);
 
 // New CRUD routes
-router.put('/:bookId', authenticateToken, requireWriter, requireOwnership('book', 'bookId'), updateBook);
-router.delete('/:bookId', authenticateToken, requireWriter, requireOwnership('book', 'bookId'), deleteBook);
+router.put(
+  '/:bookId',
+  authenticateToken,
+  requireWriter,
+  requireOwnership('book', 'bookId'),
+  updateBook
+);
+router.delete(
+  '/:bookId',
+  authenticateToken,
+  requireWriter,
+  requireOwnership('book', 'bookId'),
+  deleteBook
+);
 
 // New search and filter routes
 router.get('/search', authenticateToken, searchBooksHandler);
@@ -40,7 +52,11 @@ router.get('/author/:authorId', authenticateToken, getBooksByAuthorHandler);
 
 // Reviews and Ratings routes
 router.get('/:bookId/reviews', authenticateToken, getBookReviewsHandler);
-router.get('/:bookId/rating-stats', authenticateToken, getBookRatingStatsHandler);
+router.get(
+  '/:bookId/rating-stats',
+  authenticateToken,
+  getBookRatingStatsHandler
+);
 router.get('/top-rated', authenticateToken, getTopRatedBooksHandler);
 
 // Categorization routes

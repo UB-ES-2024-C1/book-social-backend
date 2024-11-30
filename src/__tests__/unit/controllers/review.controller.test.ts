@@ -41,6 +41,8 @@ describe('Review Controller', () => {
       lastName: 'Doe',
       email: 'john@example.com',
       username: 'johndoe',
+      genre: 'Fiction',
+      description: 'Test user description',
       role: UserRole.WRITER,
     } as User;
 
