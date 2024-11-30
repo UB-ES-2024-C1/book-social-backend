@@ -4,6 +4,7 @@ import {
   authenticateToken,
   requireWriter,
 } from '../middleware/auth.middleware';
+import { getListOfBooks } from '../controllers/book.controller';
 
 const router = express.Router();
 
