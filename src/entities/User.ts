@@ -8,6 +8,7 @@ import {
   MaxLength,
   IsNotEmpty,
   IsEnum,
+  IsOptional,
 } from 'class-validator';
 import { Book } from './Book';
 import { Review } from './Review';
@@ -58,6 +59,7 @@ export class User {
   @Length(0, 1000, {
     message: 'Description must be less than 1000 characters',
   })
+  @IsOptional()
   description?: string;
 
   @Column({ unique: true })

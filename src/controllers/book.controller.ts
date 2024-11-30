@@ -87,17 +87,14 @@ export const create = async (req: Request, res: Response) => {
   }
 };
 
-export const getListOfBooks = async (
-  req: Request,
-  res: Response,
-) => {
+export const getListOfBooks = async (req: Request, res: Response) => {
   try {
     // Fetch all books
     const books = await getBooksList(req.body);
     // Respond with the list of books
     res.status(200).json(books);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({
       error: 'An error occurred while fetching the list of books.',
     });

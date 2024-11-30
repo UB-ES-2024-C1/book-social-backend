@@ -12,6 +12,8 @@ describe('Book Validation', () => {
     email: 'test@example.com',
     username: 'testauthor',
     password: 'Password123!',
+    genre: 'Fiction',
+    description: 'A test author',
     role: UserRole.WRITER,
     books: [],
   } as User;
