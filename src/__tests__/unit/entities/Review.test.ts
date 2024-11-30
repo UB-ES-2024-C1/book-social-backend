@@ -1,11 +1,13 @@
+// Deshabilitar el mock de class-validator para este archivo
+// ya que necesitamos las validaciones reales para probar la entidad
+jest.unmock('class-validator');
+
+import 'reflect-metadata';
 import { Review } from '../../../entities/Review';
 import { User } from '../../../entities/User';
 import { Book } from '../../../entities/Book';
 import { UserRole } from '../../../entities/User';
 import { validate } from 'class-validator';
-
-// Necesario para que los decoradores funcionen en los tests
-import 'reflect-metadata';
 
 describe('Review Entity', () => {
   // Mock data setup

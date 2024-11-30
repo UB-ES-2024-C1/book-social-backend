@@ -1,3 +1,7 @@
+// Deshabilitar el mock de class-validator para este archivo
+// ya que necesitamos las validaciones reales para probar la entidad
+jest.unmock('class-validator');
+import 'reflect-metadata';
 import { AppDataSource } from '../../../config/database';
 import { User } from '../../../entities/User';
 import { loginUser, registerUser } from '../../../services/auth.service';
@@ -131,7 +135,6 @@ describe('Auth Service', () => {
       expect(result.user).toHaveProperty('id', 1);
     });
 
-    // Add new test for password validation
     it('should return error for invalid password format', async () => {
       const result = await registerUser(
         'John',

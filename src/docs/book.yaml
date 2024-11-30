@@ -1,72 +1,239 @@
 openapi: 3.0.0
+
+tags:
+  - name: Books
+    description: Book management endpoints
+  - name: Reviews
+    description: Book review related endpoints
+  - name: Statistics
+    description: Book statistics and analytics
+
+components:
+  schemas:
+    BookListDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        genres:
+          type: array
+          items:
+            type: string
+        author:
+          type: object
+          properties:
+            firstName:
+              type: string
+            lastName:
+              type: string
+        shortSynopsis:
+          type: string
+          nullable: true
+        reviewValue:
+          type: number
+          nullable: true
+        image_url:
+          type: string
+          nullable: true
+
+    BookDetailDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        genres:
+          type: array
+          items:
+            type: string
+        categories:
+          type: array
+          items:
+            type: string
+        author:
+          type: object
+          properties:
+            id:
+              type: integer
+            firstName:
+              type: string
+            lastName:
+              type: string
+        synopsis:
+          type: string
+        image_url:
+          type: string
+        publication_date:
+          type: string
+          format: date
+        publisher:
+          type: string
+        ISBN:
+          type: string
+        edition:
+          type: string
+        language:
+          type: string
+        num_pages:
+          type: integer
+        externalRating:
+          type: object
+          properties:
+            reviewValue:
+              type: number
+              nullable: true
+            ratingCount:
+              type: integer
+              nullable: true
+        reviewStats:
+          type: object
+          properties:
+            averageRating:
+              type: number
+            totalReviews:
+              type: integer
+            ratingDistribution:
+              type: object
+              properties:
+                "1":
+                  type: integer
+                "2":
+                  type: integer
+                "3":
+                  type: integer
+                "4":
+                  type: integer
+                "5":
+                  type: integer
+        reviews:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              rating:
+                type: integer
+              created_at:
+                type: string
+                format: date-time
+              user:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  firstName:
+                    type: string
+                  lastName:
+                    type: string
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+          nullable: true
+        errors:
+          type: array
+          items:
+            type: string
+          nullable: true
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
 paths:
-  /books/book-detail/{bookId}:
+  /books:
     get:
-      tags:
-        - Books
-      summary: 'Retrieve a book by ID'
-      description: 'Fetches a single book details based on the provided book ID.'
+      tags: [Books]
+      summary: Get a list of books
       parameters:
-        - in: path
-          name: bookId
-          required: true
-          description: 'The ID of the book to retrieve'
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+        - in: query
+          name: orderBy
           schema:
             type: string
+            enum: [title, date, rating]
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
       responses:
         '200':
-          description: 'Successfully retrieved the book details'
+          description: List of books retrieved successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    description: 'The ID of the book'
-                  title:
-                    type: string
-                    description: 'The title of the book'
-                  author:
-                    type: string
-                    description: 'The author of the book'
-                  publication_date:
-                    type: string
-                    format: date
-                    description: 'The publication date of the book'
-                  genre:
+                  books:
                     type: array
                     items:
-                      type: string
-                    description: 'An array of genres for the book'
-                  synopsis:
-                    type: string
-                    description: 'A short summary of the book'
-                  image_url:
-                    type: string
-                    description: 'The URL of the books cover image'
-                  num_pages:
+                      $ref: '#/components/schemas/BookListDTO'
+                  total:
                     type: integer
-                    description: 'The number of pages in the book'
-                  publisher:
-                    type: string
-                    description: 'The publisher of the book'
-                  ISBN:
-                    type: string
-                    description: 'The ISBN (International Standard Book Number) of the book'
-                  ASIN:
-                    type: string
-                    description: 'The ASIN (Amazon Standard Identification Number) of the book'
-        '404':
-          description: 'Book not found'
+                  currentPage:
+                    type: integer
+                  totalPages:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
-          description: 'Internal server error'
-  /books:
+          $ref: '#/components/responses/InternalError'
+
     post:
-      tags:
-        - Books
+      tags: [Books]
       summary: Create a new book
-      description: Create a new book in the system
       security:
         - bearerAuth: []
       requestBody:
@@ -79,40 +246,38 @@ paths:
                 - title
                 - author
                 - publication_date
-                - genre
+                - genres
               properties:
                 title:
                   type: string
-                  example: 'The Great Gatsby'
                 author:
-                  type: number
-                  example: 1
+                  type: integer
+                  description: Author ID
                 publication_date:
                   type: string
                   format: date
-                  example: '1925-04-10'
                 genres:
-                  type: string[]
-                  example: ['Fiction']
+                  type: array
+                  items:
+                    type: string
+                categories:
+                  type: array
+                  items:
+                    type: string
                 synopsis:
                   type: string
-                  example: 'A story of decadence and excess...'
                 image_url:
                   type: string
-                  format: uri
-                  example: 'https://example.com/book-cover.jpg'
-                num_pages:
-                  type: integer
-                  minimum: 1
-                  example: 180
                 publisher:
                   type: string
-                  example: "Charles Scribner's Sons"
-                reviewValue:
-                  type: number
-                  minimum: 0
-                  maximum: 5
-                  example: 4.5
+                ISBN:
+                  type: string
+                edition:
+                  type: string
+                language:
+                  type: string
+                num_pages:
+                  type: integer
       responses:
         '201':
           description: Book created successfully
@@ -123,103 +288,348 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Book created successfully'
                   book:
-                    type: object
-                    properties:
-                      id:
-                        type: number
-                      title:
-                        type: string
-                      author:
-                        type: object
-                      publication_date:
-                        type: string
-                        format: date
-                      genre:
-                        type: string
+                    $ref: '#/components/schemas/BookDetailDTO'
         '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Validation failed'
-                  errors:
-                    type: array
-                    items:
-                      type: string
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Server error
+          $ref: '#/components/responses/InternalError'
+
+  /books/{bookId}:
+    parameters:
+      - in: path
+        name: bookId
+        required: true
+        schema:
+          type: integer
+        description: ID of the book
+
+    get:
+      tags: [Books]
+      summary: Get detailed book information
+      responses:
+        '200':
+          description: Book details retrieved successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Error creating book'
-  /books/book-list/:
-    post:
-      summary: Retrieve a list of books
-      description: Fetches a list of books with optional filters for genres and ordering by publication date.
-      tags:
-        - Books
+                $ref: '#/components/schemas/BookDetailDTO'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags: [Books]
+      summary: Update a book
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                genres:
-                  type: array
-                  items:
-                    type: string
-                  description: A list of genres to filter books (e.g., Fiction, Non-fiction).
-                  example: ['Fiction', 'Non-fiction']
-                orderByDate:
-                  type: boolean
-                  description: Whether to order books by publication date in ascending order.
-                  example: true
+              $ref: '#/components/schemas/BookDetailDTO'
       responses:
-        200:
-          description: A list of books matching the filters.
+        '200':
+          description: Book updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookDetailDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags: [Books]
+      summary: Delete a book
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Book deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /books/search:
+    get:
+      tags: [Books]
+      summary: Search books
+      parameters:
+        - in: query
+          name: title
+          schema:
+            type: string
+        - in: query
+          name: author
+          schema:
+            type: string
+        - in: query
+          name: genre
+          schema:
+            type: string
+        - in: query
+          name: publisher
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  books:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookListDTO'
+                  total:
+                    type: integer
+                  currentPage:
+                    type: integer
+                  totalPages:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /books/{bookId}/reviews:
+    parameters:
+      - in: path
+        name: bookId
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [Reviews]
+      summary: Get book reviews
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Reviews retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reviews:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        rating:
+                          type: integer
+                        comment:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                        user:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            firstName:
+                              type: string
+                            lastName:
+                              type: string
+                  total:
+                    type: integer
+                  currentPage:
+                    type: integer
+                  totalPages:
+                    type: integer
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /books/{bookId}/rating-stats:
+    get:
+      tags: [Statistics]
+      summary: Get book rating statistics
+      parameters:
+        - in: path
+          name: bookId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rating statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  averageRating:
+                    type: number
+                  totalReviews:
+                    type: integer
+                  distribution:
+                    type: object
+                    properties:
+                      "5":
+                        type: integer
+                      "4":
+                        type: integer
+                      "3":
+                        type: integer
+                      "2":
+                        type: integer
+                      "1":
+                        type: integer
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /books/categories:
+    get:
+      tags: [Books]
+      summary: Get all book categories
+      responses:
+        '200':
+          description: Categories retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      description: The unique identifier of the book.
-                      example: 1
-                    title:
-                      type: string
-                      description: The title of the book.
-                      example: 'The Great Gatsby'
-        400:
-          description: Invalid request body.
+                  type: string
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /books/genres:
+    get:
+      tags: [Books]
+      summary: Get all book genres
+      responses:
+        '200':
+          description: Genres retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /books/recent:
+    get:
+      tags: [Books]
+      summary: Get recently added books
+      parameters:
+        - in: query
+          name: days
+          schema:
+            type: integer
+            default: 30
+          description: Number of days to look back
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of books to return
+      responses:
+        '200':
+          description: Recent books retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookListDTO'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /books/stats:
+    get:
+      tags: [Statistics]
+      summary: Get book statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Statistics retrieved successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  error:
-                    type: string
-                    example: 'Invalid genres parameter.'
-        500:
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: 'An error occurred while fetching the list of books.'
+                  byGenre:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        genre:
+                          type: string
+                        count:
+                          type: integer
+                  byYear:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        year:
+                          type: integer
+                        count:
+                          type: integer
+                  ratingsByGenre:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        genre:
+                          type: string
+                        avgRating:
+                          type: number
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
