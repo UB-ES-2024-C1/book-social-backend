@@ -13,7 +13,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: serverUrl,
+        url: '/',
         description: isDevelopment
           ? 'Servidor de desarrollo'
           : 'Servidor de producción',
@@ -34,7 +34,7 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ['./src/docs/**/*.yaml'], // Actualizado para usar archivos YAML
+  apis: ['./src/docs/**/*.yaml'],
 };
 
 export const swaggerSpec = swaggerJsdoc(swaggerOptions);
