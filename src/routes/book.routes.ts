@@ -1,13 +1,14 @@
 import express from 'express';
+import { getBookInfo, create } from '../controllers/book.controller';
 import {
-  getBookInfo,
-  getListOfBooks,
-  create,
-} from '../controllers/book.controller';
+  authenticateToken,
+  requireWriter,
+} from '../middleware/auth.middleware';
+
 const router = express.Router();
 
-router.get('/book-detail/:id', getBookInfo);
-router.post('/book-list/', getListOfBooks);
-router.post('/', create);
+router.get('/book-detail/:id', authenticateToken, getBookInfo);
+router.post('/book-list/', authenticateToken, getListOfBooks);
+router.post('/', authenticateToken, requireWriter, create);
 
 export default router;
