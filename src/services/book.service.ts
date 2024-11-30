@@ -533,23 +533,25 @@ export const getBookReviews = async (
   limit: number = 10
 ): Promise<{ reviews: Review[]; total: number; error?: string }> => {
   try {
-    const [reviews, total] = await AppDataSource.getRepository(Review)
-      .createQueryBuilder('review')
-      .leftJoinAndSelect('review.user', 'user')
-      .where('review.bookId = :bookId', { bookId })
-      .select([
-        'review.id',
-        'review.rating',
-        'review.comment',
-        'review.createdAt',
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-      ])
-      .orderBy('review.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getManyAndCount();
+    const reviewRepository = AppDataSource.getRepository(Review);
+    
+    const [reviews, total] = await reviewRepository.findAndCount({
+      where: { book: { id: bookId } },
+      relations: ['user'],
+      select: {
+        id: true,
+        rating: true,
+        created_at: true,
+        user: {
+          id: true,
+          firstName: true,
+          lastName: true
+        }
+      },
+      order: { created_at: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit
+    });
 
     return { reviews, total };
   } catch (error) {

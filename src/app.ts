@@ -41,9 +41,6 @@ app.get('/', (req, res) => {
 
 app.use('/auth', authRoutes);
 app.use('/books', bookRoutes);
-
-app.use('/book', bookRoutes);
-
 app.use('/reviews', reviewRoutes);
 
 // TODO: Error handling middleware

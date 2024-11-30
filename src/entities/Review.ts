@@ -6,7 +6,7 @@ import {
   ManyToOne,
   CreateDateColumn,
 } from 'typeorm';
-import { IsNotEmpty, IsNumber, Min, Max, IsDate } from 'class-validator';
+import { IsNotEmpty, IsNumber, Min, Max } from 'class-validator';
 import { User } from './User';
 import { Book } from './Book';
 
@@ -34,6 +34,5 @@ export class Review {
   rating!: number;
 
   @CreateDateColumn()
-  @IsDate({ message: 'Created date must be a valid date' })
   created_at!: Date;
 }

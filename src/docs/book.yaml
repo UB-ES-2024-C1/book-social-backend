@@ -53,6 +53,7 @@ components:
           type: array
           items:
             type: string
+          nullable: true
         author:
           type: object
           properties:
@@ -64,21 +65,28 @@ components:
               type: string
         synopsis:
           type: string
+          nullable: true
         image_url:
           type: string
+          nullable: true
         publication_date:
           type: string
           format: date
         publisher:
           type: string
+          nullable: true
         ISBN:
           type: string
+          nullable: true
         edition:
           type: string
+          nullable: true
         language:
           type: string
+          nullable: true
         num_pages:
           type: integer
+          nullable: true
         externalRating:
           type: object
           properties:
@@ -180,54 +188,21 @@ components:
       bearerFormat: JWT
 
 paths:
-  /books:
+  /books/book-list:
     get:
       tags: [Books]
       summary: Get a list of books
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 50
-            default: 10
-        - in: query
-          name: orderBy
-          schema:
-            type: string
-            enum: [title, date, rating]
-        - in: query
-          name: order
-          schema:
-            type: string
-            enum: [asc, desc]
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: List of books retrieved successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  books:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/BookListDTO'
-                  total:
-                    type: integer
-                  currentPage:
-                    type: integer
-                  totalPages:
-                    type: integer
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookListDTO'
         '500':
           $ref: '#/components/responses/InternalError'
 
@@ -297,10 +272,10 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /books/{bookId}:
+  /books/book-detail/{id}:
     parameters:
       - in: path
-        name: bookId
+        name: id
         required: true
         schema:
           type: integer
@@ -309,6 +284,8 @@ paths:
     get:
       tags: [Books]
       summary: Get detailed book information
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Book details retrieved successfully
@@ -374,6 +351,8 @@ paths:
     get:
       tags: [Books]
       summary: Search books
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: title
@@ -391,34 +370,15 @@ paths:
           name: publisher
           schema:
             type: string
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 10
       responses:
         '200':
           description: Search results
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  books:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/BookListDTO'
-                  total:
-                    type: integer
-                  currentPage:
-                    type: integer
-                  totalPages:
-                    type: integer
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookListDTO'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
@@ -434,54 +394,36 @@ paths:
     get:
       tags: [Reviews]
       summary: Get book reviews
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 10
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Reviews retrieved successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  reviews:
-                    type: array
-                    items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    rating:
+                      type: integer
+                    comment:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+                    user:
                       type: object
                       properties:
                         id:
                           type: integer
-                        rating:
-                          type: integer
-                        comment:
+                        firstName:
                           type: string
-                        created_at:
+                        lastName:
                           type: string
-                          format: date-time
-                        user:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                            firstName:
-                              type: string
-                            lastName:
-                              type: string
-                  total:
-                    type: integer
-                  currentPage:
-                    type: integer
-                  totalPages:
-                    type: integer
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -491,6 +433,8 @@ paths:
     get:
       tags: [Statistics]
       summary: Get book rating statistics
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: bookId
@@ -505,25 +449,28 @@ paths:
               schema:
                 type: object
                 properties:
-                  averageRating:
-                    type: number
-                  totalReviews:
-                    type: integer
-                  distribution:
+                  stats:
                     type: object
                     properties:
-                      "5":
+                      averageRating:
+                        type: number
+                      totalReviews:
                         type: integer
-                      "4":
-                        type: integer
-                      "3":
-                        type: integer
-                      "2":
-                        type: integer
-                      "1":
-                        type: integer
-        '404':
-          $ref: '#/components/responses/NotFound'
+                      distribution:
+                        type: object
+                        properties:
+                          "5":
+                            type: integer
+                          "4":
+                            type: integer
+                          "3":
+                            type: integer
+                          "2":
+                            type: integer
+                          "1":
+                            type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
 
@@ -531,15 +478,22 @@ paths:
     get:
       tags: [Books]
       summary: Get all book categories
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Categories retrieved successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
 
@@ -547,15 +501,22 @@ paths:
     get:
       tags: [Books]
       summary: Get all book genres
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Genres retrieved successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                type: object
+                properties:
+                  genres:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
 
@@ -563,6 +524,8 @@ paths:
     get:
       tags: [Books]
       summary: Get recently added books
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: days
@@ -582,9 +545,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BookListDTO'
+                type: object
+                properties:
+                  books:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookListDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
 
@@ -602,34 +570,92 @@ paths:
               schema:
                 type: object
                 properties:
-                  byGenre:
+                  stats:
+                    type: object
+                    properties:
+                      byGenre:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            genre:
+                              type: string
+                            count:
+                              type: integer
+                      byYear:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            year:
+                              type: integer
+                            count:
+                              type: integer
+                      ratingsByGenre:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            genre:
+                              type: string
+                            avgRating:
+                              type: number
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /books/author/{authorId}:
+    get:
+      tags: [Books]
+      summary: Get books by author
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: authorId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Books retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookListDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /books/top-rated:
+    get:
+      tags: [Books]
+      summary: Get top rated books
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Top rated books retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  books:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        genre:
-                          type: string
-                        count:
-                          type: integer
-                  byYear:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        year:
-                          type: integer
-                        count:
-                          type: integer
-                  ratingsByGenre:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        genre:
-                          type: string
-                        avgRating:
-                          type: number
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                      $ref: '#/components/schemas/BookListDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
