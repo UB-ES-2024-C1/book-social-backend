@@ -35,6 +35,8 @@ export const validateLoginInput = (
  * @param {string} username - The username to be validated.
  * @param {string} email - The email to be validated.
  * @param {string} password - The password to be validated.
+ * @param {string} genre - The literary genre to be validated.
+ * @param {string} description - The description to be validated.
  * @returns {{isValid: boolean; errors: string[]}} - An object containing a boolean indicating if the input is valid and an array of error messages.
  */
 export const validateRegisterInput = (
@@ -42,7 +44,9 @@ export const validateRegisterInput = (
   lastName: string,
   username: string,
   email: string,
-  password: string
+  password: string,
+  genre: string,
+  description?: string
 ): {
   isValid: boolean;
   errors: string[];
@@ -55,6 +59,7 @@ export const validateRegisterInput = (
   if (!username?.trim()) errors.push('Username is required');
   if (!email?.trim()) errors.push('Email is required');
   if (!password?.trim()) errors.push('Password is required');
+  if (!genre?.trim()) errors.push('Literary genre is required');
 
   // Length validations
   if (firstName?.length > 50)
@@ -65,6 +70,10 @@ export const validateRegisterInput = (
     errors.push('Username must be at least 3 characters long');
   if (username?.length > 30)
     errors.push('Username must be less than 30 characters');
+  if (genre?.length > 50)
+    errors.push('Literary genre must be between 1 and 50 characters');
+  if (description && description.length > 1000)
+    errors.push('Description must be less than 1000 characters');
 
   // Format validations
   const usernameRegex = /^[a-zA-Z0-9_-]+$/;
