@@ -84,3 +84,55 @@ export const register = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error registering user', error });
   }
 };
+
+/**
+ * Returns the authenticated user's information
+ * 
+ * @param req - The Express request object
+ * @param res - The Express response object
+ */
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
+    }
+
+    let userData;
+    try {
+      const { 
+        firstName: name,
+        lastName: lastname,
+        email,
+        description,
+        id,
+        username,
+        role,
+        genre: favGenre
+      } = req.user;
+      
+      userData = {
+        name,
+        email,
+        description: description || '',
+        id: id.toString(),
+        lastname,
+        username,
+        role: role.toLowerCase(),
+        favGenre,
+        image: '',
+        coverImage: '',
+        posts: []
+      };
+    } catch {
+      throw new Error('Error processing user data');
+    }
+    
+    res.status(200).json(userData);
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Error fetching user data', 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    });
+  }
+};

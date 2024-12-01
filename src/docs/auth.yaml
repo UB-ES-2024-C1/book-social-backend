@@ -39,7 +39,7 @@ paths:
                     description: JWT token for authentication
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         '400':
-          description: Invalid input
+          description: Validation failed
           content:
             application/json:
               schema:
@@ -47,8 +47,12 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: Error message describing the validation failure
-                    example: Invalid email format
+                    example: "Validation failed"
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Invalid email format", "Password must be at least 8 characters long"]
         '401':
           description: Authentication failed
           content:
@@ -58,8 +62,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: Error message
-                    example: Invalid credentials
+                    example: "Invalid credentials"
         '500':
           description: Server error
           content:
@@ -69,8 +72,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: Error message
-                    example: Error logging in
+                    example: "Error logging in"
                   error:
                     type: object
                     description: Error details
@@ -93,37 +95,38 @@ paths:
                 - username
                 - email
                 - password
+                - genre
               properties:
                 firstName:
                   type: string
-                  example: "Pedro"
-                  description: User's first name
+                  example: "John"
+                  description: User's first name (1-50 chars, letters, spaces, hyphens and apostrophes only)
                 lastName:
                   type: string
-                  example: "Picapiedra"
-                  description: User's last name
+                  example: "Doe"
+                  description: User's last name (1-50 chars, letters, spaces, hyphens and apostrophes only)
                 username:
                   type: string
-                  example: "pedropicapiedra"
-                  description: User's unique username
+                  example: "johndoe"
+                  description: User's unique username (3-30 chars, letters, numbers, underscores and dashes only)
                 email:
                   type: string
                   format: email
-                  example: "pedropicapiedra@example.com"
-                  description: User's email address
+                  example: "john.doe@example.com"
+                  description: User's unique email address (max 255 chars)
                 password:
                   type: string
                   format: password
                   example: "ValidPass1!"
-                  description: User's password (min 8 chars, must include uppercase, lowercase, number and special char)
+                  description: User's password (8-100 chars, must include uppercase, lowercase, number and special char)
                 genre:
                   type: string
-                  example: "Science Fiction"
-                  description: "User's preferred literary genre"
+                  example: "Fiction"
+                  description: User's preferred literary genre (1-50 chars)
                 description:
                   type: string
-                  example: "I love reading and writing science fiction novels..."
-                  description: "Optional user description"
+                  example: "I love reading books"
+                  description: Optional user description (max 1000 chars)
       responses:
         '201':
           description: User successfully registered
@@ -132,12 +135,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  token:
+                  message:
                     type: string
-                    description: JWT token for authentication
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    example: "User registered successfully"
+                  userId:
+                    type: number
+                    example: 1
         '400':
-          description: Invalid input
+          description: Invalid input or user already exists
           content:
             application/json:
               schema:
@@ -145,19 +150,12 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: Error message describing the validation failure
-                    example: "Invalid email format"
-        '409':
-          description: User already exists
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: Error message
-                    example: "User with this email already exists"
+                    example: "Validation failed"
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Email already exists", "Username must be at least 3 characters long"]
         '500':
           description: Server error
           content:
@@ -167,8 +165,100 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: Error message
                     example: "Error registering user"
                   error:
                     type: object
                     description: Error details
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get authenticated user information
+      description: Returns the current authenticated user's information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: User's first name
+                    example: "John"
+                  email:
+                    type: string
+                    description: User's email address
+                    example: "john.doe@example.com"
+                  description:
+                    type: string
+                    description: User's description (empty string if not set)
+                    example: "Book lover"
+                  id:
+                    type: string
+                    description: User's ID converted to string
+                    example: "1"
+                  lastname:
+                    type: string
+                    description: User's last name
+                    example: "Doe"
+                  username:
+                    type: string
+                    description: User's unique username
+                    example: "johndoe"
+                  role:
+                    type: string
+                    description: User's role in lowercase
+                    enum: ["reader", "writer"]
+                    example: "reader"
+                  favGenre:
+                    type: string
+                    description: User's preferred literary genre
+                    example: "fiction"
+                  image:
+                    type: string
+                    description: User's profile image URL (empty for now)
+                    example: ""
+                  coverImage:
+                    type: string
+                    description: User's cover image URL (empty for now)
+                    example: ""
+                  posts:
+                    type: array
+                    description: User's posts (empty for now)
+                    items: {}
+                    example: []
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Not authenticated"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error fetching user data"
+                  error:
+                    type: string
+                    example: "Error processing user data"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

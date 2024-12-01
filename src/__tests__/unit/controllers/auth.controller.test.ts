@@ -1,4 +1,5 @@
-import { login, register } from '../../../controllers/auth.controller';
+import { login, register, getMe } from '../../../controllers/auth.controller';
+import { User, UserRole } from '../../../entities/User';
 import { registerUser, loginUser } from '../../../services/auth.service';
 import { Request, Response } from 'express';
 
@@ -113,6 +114,16 @@ describe('Auth Controller - Register', () => {
     };
   });
 
+  const mockValidUser = {
+    firstName: 'Test',
+    lastName: 'User',
+    email: 'test@example.com',
+    username: 'testuser',
+    password: 'Password123!',
+    genre: 'Fiction',
+    role: UserRole.READER
+  };
+
   it('should return 400 for invalid registration data', async () => {
     req.body = {};
 
@@ -127,6 +138,7 @@ describe('Auth Controller - Register', () => {
         'Username is required',
         'Email is required',
         'Password is required',
+        'Literary genre is required',
         'Invalid email format',
         'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters',
       ],
@@ -134,61 +146,50 @@ describe('Auth Controller - Register', () => {
   });
 
   it('should return 400 if email already exists', async () => {
-    req.body = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'johndoe',
-      email: 'existing@example.com',
-      password: 'ValidPass1!',
+    const req = {
+      body: { ...mockValidUser }
     };
-
+    
     (registerUser as jest.Mock).mockResolvedValue({
-      user: null,
-      error: 'Email already exists',
+      success: false,
+      error: 'Email already exists'
     });
 
     await register(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Email already exists',
+      message: 'Email already exists'
     });
   });
 
   it('should return 400 if username already exists', async () => {
-    req.body = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'existinguser',
-      email: 'new@example.com',
-      password: 'ValidPass1!',
+    const req = {
+      body: { ...mockValidUser }
     };
-
+    
     (registerUser as jest.Mock).mockResolvedValue({
-      user: null,
-      error: 'Username already exists',
+      success: false,
+      error: 'Username already exists'
     });
 
     await register(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Username already exists',
+      message: 'Username already exists'
     });
   });
 
   it('should return 201 and userId for successful registration', async () => {
-    req.body = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'johndoe',
-      email: 'john@example.com',
-      password: 'ValidPass1!',
+    const req = {
+      body: { ...mockValidUser }
     };
-
-    const mockUser = { id: 1 };
+    
+    const mockUser = { id: 1, ...mockValidUser };
     (registerUser as jest.Mock).mockResolvedValue({
-      user: mockUser,
+      success: true,
+      user: mockUser
     });
 
     await register(req as Request, res as Response);
@@ -196,19 +197,16 @@ describe('Auth Controller - Register', () => {
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       message: 'User registered successfully',
-      userId: mockUser.id,
+      userId: mockUser.id
     });
   });
 
   it('should call next with error on exception', async () => {
-    req.body = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'johndoe',
-      email: 'john@example.com',
-      password: 'ValidPass1!',
+    const mockError = new Error('Database error');
+    const req = {
+      body: { ...mockValidUser }
     };
-    const mockError = new Error('Test error');
+
     (registerUser as jest.Mock).mockRejectedValue(mockError);
 
     await register(req as Request, res as Response);
@@ -216,7 +214,89 @@ describe('Auth Controller - Register', () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       message: 'Error registering user',
-      error: mockError,
+      error: mockError
+    });
+  });
+});
+
+describe('Auth Controller - GetMe', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+
+  beforeEach(() => {
+    req = {
+      user: {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        username: 'johndoe',
+        role: UserRole.READER,
+        genre: 'Fiction',
+        description: 'Test description'
+      } as User,
+    };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it('should return 401 when user is not authenticated', async () => {
+    req.user = undefined;
+    await getMe(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({ message: 'Not authenticated' });
+  });
+
+  it('should return formatted user data when authenticated', async () => {
+    await getMe(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      name: 'John',
+      email: 'john@example.com',
+      description: 'Test description',
+      id: '1',
+      lastname: 'Doe',
+      username: 'johndoe',
+      role: 'reader',
+      favGenre: 'Fiction',
+      image: '',
+      coverImage: '',
+      posts: []
+    });
+  });
+
+  it('should return empty string for null description', async () => {
+    req.user = {
+      ...req.user as User,
+      description: undefined
+    } as User;
+
+    await getMe(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      description: ''
+    }));
+  });
+
+  it('should handle error and return 500', async () => {
+    // Simular un error en el objeto user
+    req.user = new Proxy({} as User, {
+      get() {
+        throw new Error('Test error');
+      }
+    });
+
+    await getMe(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Error fetching user data',
+      error: 'Error processing user data'
     });
   });
 });
