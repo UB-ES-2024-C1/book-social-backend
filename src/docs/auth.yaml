@@ -47,12 +47,16 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Validation failed"
+                    example: 'Validation failed'
                   errors:
                     type: array
                     items:
                       type: string
-                    example: ["Invalid email format", "Password must be at least 8 characters long"]
+                    example:
+                      [
+                        'Invalid email format',
+                        'Password must be at least 8 characters long',
+                      ]
         '401':
           description: Authentication failed
           content:
@@ -62,7 +66,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid credentials"
+                    example: 'Invalid credentials'
         '500':
           description: Server error
           content:
@@ -72,7 +76,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Error logging in"
+                    example: 'Error logging in'
                   error:
                     type: object
                     description: Error details
@@ -99,33 +103,33 @@ paths:
               properties:
                 firstName:
                   type: string
-                  example: "John"
+                  example: 'John'
                   description: User's first name (1-50 chars, letters, spaces, hyphens and apostrophes only)
                 lastName:
                   type: string
-                  example: "Doe"
+                  example: 'Doe'
                   description: User's last name (1-50 chars, letters, spaces, hyphens and apostrophes only)
                 username:
                   type: string
-                  example: "johndoe"
+                  example: 'johndoe'
                   description: User's unique username (3-30 chars, letters, numbers, underscores and dashes only)
                 email:
                   type: string
                   format: email
-                  example: "john.doe@example.com"
+                  example: 'john.doe@example.com'
                   description: User's unique email address (max 255 chars)
                 password:
                   type: string
                   format: password
-                  example: "ValidPass1!"
+                  example: 'ValidPass1!'
                   description: User's password (8-100 chars, must include uppercase, lowercase, number and special char)
                 genre:
                   type: string
-                  example: "Fiction"
+                  example: 'Fiction'
                   description: User's preferred literary genre (1-50 chars)
                 description:
                   type: string
-                  example: "I love reading books"
+                  example: 'I love reading books'
                   description: Optional user description (max 1000 chars)
       responses:
         '201':
@@ -137,7 +141,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "User registered successfully"
+                    example: 'User registered successfully'
                   userId:
                     type: number
                     example: 1
@@ -150,12 +154,16 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Validation failed"
+                    example: 'Validation failed'
                   errors:
                     type: array
                     items:
                       type: string
-                    example: ["Email already exists", "Username must be at least 3 characters long"]
+                    example:
+                      [
+                        'Email already exists',
+                        'Username must be at least 3 characters long',
+                      ]
         '500':
           description: Server error
           content:
@@ -165,10 +173,117 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Error registering user"
+                    example: 'Error registering user'
                   error:
                     type: object
                     description: Error details
+  /auth/update:
+    patch:
+      summary: Update user profile
+      description: Updates specific fields of a user's profile.
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  description: The first name of the user.
+                  example: Josep
+                lastName:
+                  type: string
+                  description: The last name of the user.
+                  example: Belmonte
+                email:
+                  type: string
+                  format: email
+                  description: The email of the user.
+                  example: josep.updated@example.com
+                genre:
+                  type: string
+                  description: Favourite Genre
+                  exemple: Fiction
+                description:
+                  type: string
+
+              required:
+                - firstName
+                - lastName
+                - email
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Profile updated successfully
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      firstName:
+                        type: string
+                        example: Josep
+                      lastName:
+                        type: string
+                        example: Belmonte
+                      email:
+                        type: string
+                        example: josep.updated@example.com
+                      role:
+                        type: string
+                        enum: [reader, writer]
+                        example: reader
+        '400':
+          description: Bad Request - Validation Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Validation failed
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - 'First name is required'
+                      - 'Email must be a valid email address'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: An error occurred
+                  error:
+                    type: string
+                    example: Database connection failed
 
   /auth/me:
     get:
@@ -189,44 +304,44 @@ paths:
                   name:
                     type: string
                     description: User's first name
-                    example: "John"
+                    example: 'John'
                   email:
                     type: string
                     description: User's email address
-                    example: "john.doe@example.com"
+                    example: 'john.doe@example.com'
                   description:
                     type: string
                     description: User's description (empty string if not set)
-                    example: "Book lover"
+                    example: 'Book lover'
                   id:
                     type: string
                     description: User's ID converted to string
-                    example: "1"
+                    example: '1'
                   lastname:
                     type: string
                     description: User's last name
-                    example: "Doe"
+                    example: 'Doe'
                   username:
                     type: string
                     description: User's unique username
-                    example: "johndoe"
+                    example: 'johndoe'
                   role:
                     type: string
                     description: User's role in lowercase
-                    enum: ["reader", "writer"]
-                    example: "reader"
+                    enum: ['reader', 'writer']
+                    example: 'reader'
                   favGenre:
                     type: string
                     description: User's preferred literary genre
-                    example: "fiction"
+                    example: 'fiction'
                   image:
                     type: string
                     description: User's profile image URL (empty for now)
-                    example: ""
+                    example: ''
                   coverImage:
                     type: string
                     description: User's cover image URL (empty for now)
-                    example: ""
+                    example: ''
                   posts:
                     type: array
                     description: User's posts (empty for now)
@@ -241,7 +356,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Not authenticated"
+                    example: 'Not authenticated'
         '500':
           description: Server error
           content:
@@ -251,10 +366,10 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Error fetching user data"
+                    example: 'Error fetching user data'
                   error:
                     type: string
-                    example: "Error processing user data"
+                    example: 'Error processing user data'
 
 components:
   securitySchemes:
