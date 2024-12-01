@@ -84,3 +84,24 @@ export const register = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error registering user', error });
   }
 };
+
+/**
+ * Returns the authenticated user's information
+ * 
+ * @param req - The Express request object
+ * @param res - The Express response object
+ */
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
+    }
+
+    const { password: _, ...userWithoutPassword } = req.user;
+    
+    res.status(200).json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user data', error });
+  }
+};

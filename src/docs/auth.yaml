@@ -172,3 +172,65 @@ paths:
                   error:
                     type: object
                     description: Error details
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get authenticated user information
+      description: Returns the current authenticated user's information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  firstName:
+                    type: string
+                    example: "John"
+                  lastName:
+                    type: string
+                    example: "Doe"
+                  username:
+                    type: string
+                    example: "johndoe"
+                  email:
+                    type: string
+                    example: "john.doe@example.com"
+                  genre:
+                    type: string
+                    example: "Science Fiction"
+                  description:
+                    type: string
+                    example: "I love reading sci-fi novels..."
+                  role:
+                    type: string
+                    enum: [READER, WRITER]
+                    example: "READER"
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Not authenticated"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error fetching user data"

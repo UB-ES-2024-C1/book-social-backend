@@ -1,4 +1,5 @@
 import { login, register } from '../../../controllers/auth.controller';
+import { UserRole } from '../../../entities/User';
 import { registerUser, loginUser } from '../../../services/auth.service';
 import { Request, Response } from 'express';
 
@@ -113,6 +114,16 @@ describe('Auth Controller - Register', () => {
     };
   });
 
+  const mockValidUser = {
+    firstName: 'Test',
+    lastName: 'User',
+    email: 'test@example.com',
+    username: 'testuser',
+    password: 'Password123!',
+    genre: 'Fiction',
+    role: UserRole.READER
+  };
+
   it('should return 400 for invalid registration data', async () => {
     req.body = {};
 
@@ -127,6 +138,7 @@ describe('Auth Controller - Register', () => {
         'Username is required',
         'Email is required',
         'Password is required',
+        'Literary genre is required',
         'Invalid email format',
         'Password must be at least 8 characters long, contain uppercase and lowercase letters, numbers, and special characters',
       ],
@@ -134,61 +146,50 @@ describe('Auth Controller - Register', () => {
   });
 
   it('should return 400 if email already exists', async () => {
-    req.body = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'johndoe',
-      email: 'existing@example.com',
-      password: 'ValidPass1!',
+    const req = {
+      body: { ...mockValidUser }
     };
-
+    
     (registerUser as jest.Mock).mockResolvedValue({
-      user: null,
-      error: 'Email already exists',
+      success: false,
+      error: 'Email already exists'
     });
 
     await register(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Email already exists',
+      message: 'Email already exists'
     });
   });
 
   it('should return 400 if username already exists', async () => {
-    req.body = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'existinguser',
-      email: 'new@example.com',
-      password: 'ValidPass1!',
+    const req = {
+      body: { ...mockValidUser }
     };
-
+    
     (registerUser as jest.Mock).mockResolvedValue({
-      user: null,
-      error: 'Username already exists',
+      success: false,
+      error: 'Username already exists'
     });
 
     await register(req as Request, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      message: 'Username already exists',
+      message: 'Username already exists'
     });
   });
 
   it('should return 201 and userId for successful registration', async () => {
-    req.body = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'johndoe',
-      email: 'john@example.com',
-      password: 'ValidPass1!',
+    const req = {
+      body: { ...mockValidUser }
     };
-
-    const mockUser = { id: 1 };
+    
+    const mockUser = { id: 1, ...mockValidUser };
     (registerUser as jest.Mock).mockResolvedValue({
-      user: mockUser,
+      success: true,
+      user: mockUser
     });
 
     await register(req as Request, res as Response);
@@ -196,19 +197,16 @@ describe('Auth Controller - Register', () => {
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       message: 'User registered successfully',
-      userId: mockUser.id,
+      userId: mockUser.id
     });
   });
 
   it('should call next with error on exception', async () => {
-    req.body = {
-      firstName: 'John',
-      lastName: 'Doe',
-      username: 'johndoe',
-      email: 'john@example.com',
-      password: 'ValidPass1!',
+    const mockError = new Error('Database error');
+    const req = {
+      body: { ...mockValidUser }
     };
-    const mockError = new Error('Test error');
+
     (registerUser as jest.Mock).mockRejectedValue(mockError);
 
     await register(req as Request, res as Response);
@@ -216,7 +214,7 @@ describe('Auth Controller - Register', () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       message: 'Error registering user',
-      error: mockError,
+      error: mockError
     });
   });
 });
