@@ -106,15 +106,15 @@ components:
             ratingDistribution:
               type: object
               properties:
-                "1":
+                '1':
                   type: integer
-                "2":
+                '2':
                   type: integer
-                "3":
+                '3':
                   type: integer
-                "4":
+                '4':
                   type: integer
-                "5":
+                '5':
                   type: integer
         reviews:
           type: array
@@ -159,21 +159,21 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    
+
     Unauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    
+
     NotFound:
       description: Resource not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    
+
     InternalError:
       description: Internal server error
       content:
@@ -205,7 +205,7 @@ paths:
                   $ref: '#/components/schemas/BookListDTO'
         '500':
           $ref: '#/components/responses/InternalError'
-
+  /books:
     post:
       tags: [Books]
       summary: Create a new book
@@ -459,15 +459,15 @@ paths:
                       distribution:
                         type: object
                         properties:
-                          "5":
+                          '5':
                             type: integer
-                          "4":
+                          '4':
                             type: integer
-                          "3":
+                          '3':
                             type: integer
-                          "2":
+                          '2':
                             type: integer
-                          "1":
+                          '1':
                             type: integer
         '400':
           $ref: '#/components/responses/BadRequest'
