@@ -98,10 +98,41 @@ export const getMe = async (req: Request, res: Response) => {
       return;
     }
 
-    const { password: _, ...userWithoutPassword } = req.user;
+    let userData;
+    try {
+      const { 
+        firstName: name,
+        lastName: lastname,
+        email,
+        description,
+        id,
+        username,
+        role,
+        genre: favGenre
+      } = req.user;
+      
+      userData = {
+        name,
+        email,
+        description: description || '',
+        id: id.toString(),
+        lastname,
+        username,
+        role: role.toLowerCase(),
+        favGenre,
+        image: '',
+        coverImage: '',
+        posts: []
+      };
+    } catch {
+      throw new Error('Error processing user data');
+    }
     
-    res.status(200).json(userWithoutPassword);
+    res.status(200).json(userData);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching user data', error });
+    res.status(500).json({ 
+      message: 'Error fetching user data', 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    });
   }
 };

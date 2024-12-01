@@ -1,5 +1,5 @@
-import { login, register } from '../../../controllers/auth.controller';
-import { UserRole } from '../../../entities/User';
+import { login, register, getMe } from '../../../controllers/auth.controller';
+import { User, UserRole } from '../../../entities/User';
 import { registerUser, loginUser } from '../../../services/auth.service';
 import { Request, Response } from 'express';
 
@@ -215,6 +215,88 @@ describe('Auth Controller - Register', () => {
     expect(res.json).toHaveBeenCalledWith({
       message: 'Error registering user',
       error: mockError
+    });
+  });
+});
+
+describe('Auth Controller - GetMe', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+
+  beforeEach(() => {
+    req = {
+      user: {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        username: 'johndoe',
+        role: UserRole.READER,
+        genre: 'Fiction',
+        description: 'Test description'
+      } as User,
+    };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  });
+
+  it('should return 401 when user is not authenticated', async () => {
+    req.user = undefined;
+    await getMe(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({ message: 'Not authenticated' });
+  });
+
+  it('should return formatted user data when authenticated', async () => {
+    await getMe(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      name: 'John',
+      email: 'john@example.com',
+      description: 'Test description',
+      id: '1',
+      lastname: 'Doe',
+      username: 'johndoe',
+      role: 'reader',
+      favGenre: 'Fiction',
+      image: '',
+      coverImage: '',
+      posts: []
+    });
+  });
+
+  it('should return empty string for null description', async () => {
+    req.user = {
+      ...req.user as User,
+      description: undefined
+    } as User;
+
+    await getMe(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      description: ''
+    }));
+  });
+
+  it('should handle error and return 500', async () => {
+    // Simular un error en el objeto user
+    req.user = new Proxy({} as User, {
+      get() {
+        throw new Error('Test error');
+      }
+    });
+
+    await getMe(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Error fetching user data',
+      error: 'Error processing user data'
     });
   });
 });
