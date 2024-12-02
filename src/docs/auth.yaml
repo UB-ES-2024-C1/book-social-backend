@@ -182,7 +182,7 @@ paths:
       summary: Update user profile
       description: Updates specific fields of a user's profile.
       tags:
-        - User
+        - Authentication
       requestBody:
         required: true
         content:
