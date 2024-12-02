@@ -188,13 +188,7 @@ components:
       bearerFormat: JWT
 
 paths:
-  /books/book-list/{limit}:
-    parameters:
-      - in: path
-        name: limit
-        required: false
-        schema:
-          type: integer
+  /books/book-list:
     get:
       tags: [Books]
       summary: Get a list of books
