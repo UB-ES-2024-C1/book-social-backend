@@ -178,7 +178,7 @@ paths:
                     type: object
                     description: Error details
   /auth/update:
-    patch:
+    post:
       summary: Update user profile
       description: Updates specific fields of a user's profile.
       tags:
