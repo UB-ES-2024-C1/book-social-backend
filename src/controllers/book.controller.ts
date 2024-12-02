@@ -109,7 +109,8 @@ export const create = async (req: Request, res: Response) => {
  */
 export const getListOfBooks = async (req: Request, res: Response) => {
   try {
-    const books = await getBooksList(req.body);
+    const limit = parseInt(req.params.limit);
+    const books = await getBooksList({limit});
     res.status(200).json(books);
   } catch {
     res.status(500).json({
