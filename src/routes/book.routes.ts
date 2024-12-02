@@ -26,7 +26,7 @@ const router = express.Router();
 
 // Existing routes
 router.get('/book-detail/:id', authenticateToken, getBookInfo);
-router.get('/book-list/:limit?', authenticateToken, getListOfBooks);
+router.get('/book-list', authenticateToken, getListOfBooks);
 router.post('/', authenticateToken, requireWriter, create);
 
 // New CRUD routes

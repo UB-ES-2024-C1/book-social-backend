@@ -2,10 +2,13 @@ import {
   login,
   register,
   getMe,
+  updateUserProfile,
 } from '../../../controllers/auth.controller';
 import { User, UserRole } from '../../../entities/User';
 import { registerUser, loginUser } from '../../../services/auth.service';
 import { Request, Response } from 'express';
+import { AppDataSource } from '../../../config/database'; // Asegúrate de que la ruta sea correcta
+import { Repository } from 'typeorm';
 
 // Mock the auth service
 jest.mock('../../../services/auth.service', () => ({
