@@ -12,7 +12,7 @@ const app = express();
 // CORS configuration
 const corsOptions = {
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   maxAge: 86400,
@@ -41,9 +41,6 @@ app.get('/', (req, res) => {
 
 app.use('/auth', authRoutes);
 app.use('/books', bookRoutes);
-
-app.use('/book', bookRoutes);
-
 app.use('/reviews', reviewRoutes);
 
 // TODO: Error handling middleware

@@ -8,6 +8,7 @@ import {
   MaxLength,
   IsNotEmpty,
   IsEnum,
+  IsOptional,
 } from 'class-validator';
 import { Book } from './Book';
 import { Review } from './Review';
@@ -46,6 +47,20 @@ export class User {
       'Last name can only contain letters, spaces, hyphens and apostrophes',
   })
   lastName!: string;
+
+  @Column()
+  @IsNotEmpty({ message: 'Literary genre is required' })
+  @Length(1, 50, {
+    message: 'Literary genre must be between 1 and 50 characters',
+  })
+  genre!: string;
+
+  @Column({ type: 'text', nullable: true })
+  @Length(0, 1000, {
+    message: 'Description must be less than 1000 characters',
+  })
+  @IsOptional()
+  description?: string;
 
   @Column({ unique: true })
   @IsNotEmpty({ message: 'Username is required' })

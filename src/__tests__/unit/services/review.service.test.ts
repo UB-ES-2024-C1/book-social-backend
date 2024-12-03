@@ -1,16 +1,3 @@
-import { AppDataSource } from '../../../config/database';
-import { Review } from '../../../entities/Review';
-import { User } from '../../../entities/User';
-import { Book } from '../../../entities/Book';
-import { UserRole } from '../../../entities/User';
-import {
-  createReview,
-  getReviewsByBook,
-  getReviewsByUser,
-  deleteReview,
-} from '../../../services/review.service';
-
-// Mock repositories
 const mockReviewRepository = {
   save: jest.fn(),
   find: jest.fn(),
@@ -25,6 +12,23 @@ const mockBookRepository = {
   findOne: jest.fn(),
 };
 
+const mockValidate = jest.fn().mockResolvedValue([]); // Sin errores por defecto
+jest.mock('class-validator', () => ({
+  ...jest.requireActual('class-validator'),
+  validate: mockValidate,
+}));
+
+import { Review } from '../../../entities/Review';
+import { User } from '../../../entities/User';
+import { Book } from '../../../entities/Book';
+import { UserRole } from '../../../entities/User';
+import {
+  createReview,
+  getReviewsByBook,
+  getReviewsByUser,
+  deleteReview,
+} from '../../../services/review.service';
+
 // Mock AppDataSource
 jest.mock('../../../config/database', () => ({
   AppDataSource: {
@@ -35,11 +39,6 @@ jest.mock('../../../config/database', () => ({
       return {};
     }),
   },
-}));
-
-// Mock class-validator
-jest.mock('class-validator', () => ({
-  validate: jest.fn().mockResolvedValue([]),
 }));
 
 describe('Review Service', () => {
@@ -60,6 +59,8 @@ describe('Review Service', () => {
       email: 'john@example.com',
       username: 'johndoe',
       password: 'Password123!',
+      genre: 'Science Fiction',
+      description: 'Test user description',
       role: UserRole.WRITER,
     } as User;
 

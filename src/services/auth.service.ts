@@ -37,6 +37,9 @@ export const loginUser = async (
  * @param username The username of the user.
  * @param email The email of the user.
  * @param password The password of the user.
+ * @param genre The genre of the user.
+ * @param description The description of the user.
+ * @param role The role of the user.
  * @returns A Promise that resolves to an object containing the user if registration is successful, otherwise an error message.
  */
 export const registerUser = async (
@@ -45,6 +48,8 @@ export const registerUser = async (
   username: string,
   email: string,
   password: string,
+  genre: string,
+  description?: string,
   role: UserRole = UserRole.READER
 ): Promise<{ user: User | null; error?: string }> => {
   const user = new User();
@@ -54,6 +59,8 @@ export const registerUser = async (
     username,
     email,
     password,
+    genre,
+    description,
     role,
   });
 
@@ -85,6 +92,7 @@ export const registerUser = async (
     const savedUser = await userRepository.save(user);
     return { user: savedUser };
   } catch (error) {
+    console.error('Error saving user to database:', error);
     return { user: null, error: 'Error saving user to database' };
   }
 };

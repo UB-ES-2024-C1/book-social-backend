@@ -1,7 +1,6 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
-const serverUrl = `${process.env.HOST || 'localhost'}:3000`;
 
 const swaggerOptions = {
   definition: {
@@ -13,7 +12,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: '/',
         description: isDevelopment
           ? 'Servidor de desarrollo'
           : 'Servidor de producción',
@@ -34,7 +33,7 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ['./src/docs/**/*.yaml'], // Actualizado para usar archivos YAML
+  apis: ['./src/docs/**/*.yaml'],
 };
 
 export const swaggerSpec = swaggerJsdoc(swaggerOptions);

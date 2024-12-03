@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import {
   create,
   getByBook,
@@ -15,10 +15,9 @@ import { UserRole } from '../../../entities/User';
 jest.mock('../../../services/review.service');
 
 describe('Review Controller', () => {
-  // Setup for request, response and next function
+  // Setup for request, response
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
-  let mockNext: NextFunction;
 
   // Mock data
   let mockUser: User;
@@ -35,9 +34,6 @@ describe('Review Controller', () => {
       json: jest.fn(),
     };
 
-    // Setup mock next function
-    mockNext = jest.fn();
-
     // Create mock data
     mockUser = {
       id: 1,
@@ -45,6 +41,8 @@ describe('Review Controller', () => {
       lastName: 'Doe',
       email: 'john@example.com',
       username: 'johndoe',
+      genre: 'Fiction',
+      description: 'Test user description',
       role: UserRole.WRITER,
     } as User;
 
@@ -82,7 +80,7 @@ describe('Review Controller', () => {
         mockServiceResponse
       );
 
-      await create(mockRequest as Request, mockResponse as Response, mockNext);
+      await create(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -98,7 +96,7 @@ describe('Review Controller', () => {
         mockServiceResponse
       );
 
-      await create(mockRequest as Request, mockResponse as Response, mockNext);
+      await create(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -111,7 +109,7 @@ describe('Review Controller', () => {
         new Error('Server error')
       );
 
-      await create(mockRequest as Request, mockResponse as Response, mockNext);
+      await create(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -134,11 +132,7 @@ describe('Review Controller', () => {
         reviews: mockReviews,
       });
 
-      await getByBook(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await getByBook(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({ reviews: mockReviews });
@@ -149,11 +143,7 @@ describe('Review Controller', () => {
         reviews: [],
       });
 
-      await getByBook(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await getByBook(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({ reviews: [] });
@@ -162,11 +152,7 @@ describe('Review Controller', () => {
     it('should handle invalid bookId parameter', async () => {
       mockRequest.params = { bookId: 'invalid' };
 
-      await getByBook(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await getByBook(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -179,11 +165,7 @@ describe('Review Controller', () => {
         new Error('Service error')
       );
 
-      await getByBook(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await getByBook(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -206,11 +188,7 @@ describe('Review Controller', () => {
         reviews: mockReviews,
       });
 
-      await getByUser(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await getByUser(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({ reviews: mockReviews });
@@ -221,11 +199,7 @@ describe('Review Controller', () => {
         reviews: [],
       });
 
-      await getByUser(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await getByUser(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({ reviews: [] });
@@ -234,11 +208,7 @@ describe('Review Controller', () => {
     it('should handle invalid userId parameter', async () => {
       mockRequest.params = { userId: 'invalid' };
 
-      await getByUser(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await getByUser(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -251,11 +221,7 @@ describe('Review Controller', () => {
         new Error('Service error')
       );
 
-      await getByUser(
-        mockRequest as Request,
-        mockResponse as Response,
-        mockNext
-      );
+      await getByUser(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -277,7 +243,7 @@ describe('Review Controller', () => {
         success: true,
       });
 
-      await remove(mockRequest as Request, mockResponse as Response, mockNext);
+      await remove(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -291,7 +257,7 @@ describe('Review Controller', () => {
         error: 'Review not found',
       });
 
-      await remove(mockRequest as Request, mockResponse as Response, mockNext);
+      await remove(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -302,7 +268,7 @@ describe('Review Controller', () => {
     it('should handle invalid reviewId parameter', async () => {
       mockRequest.params = { reviewId: 'invalid' };
 
-      await remove(mockRequest as Request, mockResponse as Response, mockNext);
+      await remove(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -315,7 +281,7 @@ describe('Review Controller', () => {
         new Error('Service error')
       );
 
-      await remove(mockRequest as Request, mockResponse as Response, mockNext);
+      await remove(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({

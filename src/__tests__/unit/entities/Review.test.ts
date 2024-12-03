@@ -1,11 +1,13 @@
+// Deshabilitar el mock de class-validator para este archivo
+// ya que necesitamos las validaciones reales para probar la entidad
+jest.unmock('class-validator');
+
+import 'reflect-metadata';
 import { Review } from '../../../entities/Review';
 import { User } from '../../../entities/User';
 import { Book } from '../../../entities/Book';
 import { UserRole } from '../../../entities/User';
 import { validate } from 'class-validator';
-
-// Necesario para que los decoradores funcionen en los tests
-import 'reflect-metadata';
 
 describe('Review Entity', () => {
   // Mock data setup
@@ -68,7 +70,7 @@ describe('Review Entity', () => {
 
     it('should fail validation when user is missing', async () => {
       const review = new Review();
-      const { user, ...reviewWithoutUser } = validReviewData;
+      const reviewWithoutUser = { ...validReviewData, user: null };
       Object.assign(review, reviewWithoutUser);
       review.created_at = new Date();
 
@@ -86,7 +88,7 @@ describe('Review Entity', () => {
 
     it('should fail validation when book is missing', async () => {
       const review = new Review();
-      const { book, ...reviewWithoutBook } = validReviewData;
+      const reviewWithoutBook = { ...validReviewData, book: null };
       Object.assign(review, reviewWithoutBook);
       review.created_at = new Date();
 
@@ -104,7 +106,7 @@ describe('Review Entity', () => {
 
     it('should fail validation when rating is missing', async () => {
       const review = new Review();
-      const { rating, ...reviewWithoutRating } = validReviewData;
+      const reviewWithoutRating = { ...validReviewData, rating: null };
       Object.assign(review, reviewWithoutRating);
       review.created_at = new Date();
 
@@ -231,4 +233,3 @@ describe('Review Entity', () => {
     });
   });
 });
-
