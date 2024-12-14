@@ -15,51 +15,30 @@ const bookRepository = AppDataSource.getRepository(Book);
  * @param reviewData - The data for the review to be created.
  * @returns A Promise that resolves to an object containing the created review or an error message.
  */
-export const createReview = async (
-  reviewData: Partial<Review>
-): Promise<{ review: Review | null; error?: string }> => {
+export const createReview = async (reviewData: {
+  userId: number;
+  bookId: number;
+  rating: number;
+  comment?: string;
+}): Promise<{ review: Review | null; error?: string }> => {
   try {
-    // Create a new Review instance
+    const user = await userRepository.findOne({
+      where: { id: reviewData.userId },
+    });
+    const book = await bookRepository.findOne({
+      where: { id: reviewData.bookId },
+    });
+
+    if (!user || !book) {
+      return { review: null, error: 'User or Book not found' };
+    }
+
     const review = new Review();
+    review.user = user;
+    review.book = book;
+    review.rating = reviewData.rating;
+    review.comment = reviewData.comment;
 
-    // Validate user exists
-    if (reviewData.user) {
-      const userId =
-        typeof reviewData.user === 'number'
-          ? reviewData.user
-          : (reviewData.user as User).id;
-
-      const user = await userRepository.findOne({
-        where: { id: userId },
-      });
-
-      if (!user) {
-        return { review: null, error: 'User not found' };
-      }
-      review.user = user;
-    }
-
-    // Validate book exists
-    if (reviewData.book) {
-      const bookId =
-        typeof reviewData.book === 'number'
-          ? reviewData.book
-          : (reviewData.book as Book).id;
-
-      const book = await bookRepository.findOne({
-        where: { id: bookId },
-      });
-
-      if (!book) {
-        return { review: null, error: 'Book not found' };
-      }
-      review.book = book;
-    }
-
-    // Assign rating
-    review.rating = reviewData.rating!;
-
-    // Validate entity
     const errors = await validate(review);
     if (errors.length > 0) {
       const validationErrors = errors
@@ -68,12 +47,10 @@ export const createReview = async (
       return { review: null, error: validationErrors.join(', ') };
     }
 
-    // Save the review to the database
     const savedReview = await reviewRepository.save(review);
     return { review: savedReview };
   } catch (error) {
-    console.error('Error creating review:', error);
-    return { review: null, error: 'Error saving review to database' };
+    return { review: null, error: 'Error creating review' };
   }
 };
 
