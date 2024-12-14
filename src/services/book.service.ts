@@ -534,7 +534,7 @@ export const getBookReviews = async (
 ): Promise<{ reviews: Review[]; total: number; error?: string }> => {
   try {
     const reviewRepository = AppDataSource.getRepository(Review);
-    
+
     const [reviews, total] = await reviewRepository.findAndCount({
       where: { book: { id: bookId } },
       relations: ['user'],
@@ -545,12 +545,12 @@ export const getBookReviews = async (
         user: {
           id: true,
           firstName: true,
-          lastName: true
-        }
+          lastName: true,
+        },
       },
       order: { created_at: 'DESC' },
       skip: (page - 1) * limit,
-      take: limit
+      take: limit,
     });
 
     return { reviews, total };

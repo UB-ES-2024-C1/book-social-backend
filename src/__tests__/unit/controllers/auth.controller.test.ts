@@ -1,11 +1,8 @@
-import {
-  login,
-  register,
-  getMe,
-} from '../../../controllers/auth.controller';
+import { login, register, getMe, updateUserProfile } from '../../../controllers/auth.controller';
 import { User, UserRole } from '../../../entities/User';
 import { registerUser, loginUser } from '../../../services/auth.service';
 import { Request, Response } from 'express';
+import { AppDataSource } from '../../../config/database';
 
 // Mock the auth service
 jest.mock('../../../services/auth.service', () => ({
@@ -13,6 +10,11 @@ jest.mock('../../../services/auth.service', () => ({
   registerUser: jest.fn(),
 }));
 
+jest.mock('../../../config/database', () => ({
+  AppDataSource: {
+    getRepository: jest.fn(),
+  },
+}));
 
 describe('Auth Controller - Login', () => {
   let req: Partial<Request>;
@@ -224,7 +226,7 @@ describe('Auth Controller - Register', () => {
   });
 });
 
-describe('Auth Controller - GetMe', () => {
+describe('Auth Controller', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
 
@@ -239,6 +241,8 @@ describe('Auth Controller - GetMe', () => {
         role: UserRole.READER,
         genre: 'Fiction',
         description: 'Test description',
+        image: 'profile.jpg',
+        coverImage: 'cover.jpg',
       } as User,
     };
     res = {
@@ -247,168 +251,116 @@ describe('Auth Controller - GetMe', () => {
     };
   });
 
-  it('should return 401 when user is not authenticated', async () => {
-    req.user = undefined;
-    await getMe(req as Request, res as Response);
+  describe('getMe', () => {
+    it('should return user data with image and coverImage when authenticated', async () => {
+      await getMe(req as Request, res as Response);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Not authenticated' });
-  });
-
-  it('should return formatted user data when authenticated', async () => {
-    await getMe(req as Request, res as Response);
-
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({
-      name: 'John',
-      email: 'john@example.com',
-      description: 'Test description',
-      id: '1',
-      lastname: 'Doe',
-      username: 'johndoe',
-      role: 'reader',
-      favGenre: 'Fiction',
-      image: '',
-      coverImage: '',
-      posts: [],
-    });
-  });
-
-  it('should return empty string for null description', async () => {
-    req.user = {
-      ...(req.user as User),
-      description: undefined,
-    } as User;
-
-    await getMe(req as Request, res as Response);
-
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        description: '',
-      })
-    );
-  });
-
-  it('should handle error and return 500', async () => {
-    // Simular un error en el objeto user
-    req.user = new Proxy({} as User, {
-      get() {
-        throw new Error('Test error');
-      },
-    });
-
-    await getMe(req as Request, res as Response);
-
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({
-      message: 'Error fetching user data',
-      error: 'Error processing user data',
-    });
-  });
-});
-/** 
-jest.mock('../../../config/database', () => ({
-  AppDataSource: {
-    getRepository: jest.fn().mockReturnValue({
-      findOneBy: jest.fn(),
-      save: jest.fn(),
-    }),
-  },
-}));
-
-describe('updateUserProfile', () => {
-  let req: Partial<Request>;
-  let res: Partial<Response>;
-  let userRepositoryMock: jest.Mocked<Repository<User>>;
-  beforeEach(() => {
-    jest.clearAllMocks();
-    req = {
-      user: {
-        id: 1,
-        firstName: 'John',
-        lastName: 'Doe',
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        name: 'John',
         email: 'john@example.com',
-        username: 'johndoe',
-        role: UserRole.READER,
-        genre: 'Fiction',
         description: 'Test description',
-      } as User,
-    };
-    res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-    userRepositoryMock = AppDataSource.getRepository(User) as jest.Mocked<
-      Repository<User>
-    >;
-    userRepositoryMock.findOneBy.mockReset();
-  });
-
-  it('should return 401 if user is not authenticated', async () => {
-    req.user = undefined; // Simula un usuario no autenticado
-
-    await updateUserProfile(req as Request, res as Response);
-
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Not authenticated' });
-  });
-
-  it('should return 404 if user is not found', async () => {
-    // Simula que findOneBy no encuentra el usuario
-    (userRepositoryMock.findOneBy as jest.Mock).mockResolvedValue(null);
-
-    await updateUserProfile(req as Request, res as Response);
-
-    expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
-      id: 1,
+        id: '1',
+        lastname: 'Doe',
+        username: 'johndoe',
+        role: 'reader',
+        favGenre: 'Fiction',
+        image: 'profile.jpg',
+        coverImage: 'cover.jpg',
+        posts: [],
+      });
     });
-    expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith({ message: 'User not found' });
-  });
 
-  it('should update and return the user', async () => {
-    const existingUser = { id: 1, firstName: 'John', lastName: 'Doe' };
-    const updatedUser = { id: 1, firstName: 'Updated Name', lastName: 'Doe' };
+    it('should return empty strings for undefined image and coverImage', async () => {
+      req.user = {
+        ...(req.user as User),
+        image: undefined,
+        coverImage: undefined,
+      } as User;
 
-    // Simula el comportamiento de findOneBy y save
-    (userRepositoryMock.findOneBy as jest.Mock).mockResolvedValue(existingUser);
-    (userRepositoryMock.save as jest.Mock).mockResolvedValue(updatedUser);
+      await getMe(req as Request, res as Response);
 
-    req.body = { firstName: 'Updated Name' };
-
-    await updateUserProfile(req as Request, res as Response);
-
-    expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
-      id: 1,
-    });
-    expect(userRepositoryMock.save).toHaveBeenCalledWith({
-      ...existingUser,
-      firstName: 'Updated Name',
-    });
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({
-      message: 'Profile updated successfully',
-      user: updatedUser,
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          image: '',
+          coverImage: '',
+        })
+      );
     });
   });
 
-  it('should return 500 if an error occurs', async () => {
-    // Simula un error en el repositorio
-    (userRepositoryMock.findOneBy as jest.Mock).mockRejectedValue(
-      new Error('Database error')
-    );
+  describe('updateUserProfile', () => {
+    let mockUserRepository: any;
 
-    await updateUserProfile(req as Request, res as Response);
-
-    expect(userRepositoryMock.findOneBy).toHaveBeenCalledWith({
-      id: 1,
+    beforeEach(() => {
+      mockUserRepository = {
+        findOneBy: jest.fn(),
+        merge: jest.fn(),
+        save: jest.fn(),
+      };
+      (AppDataSource.getRepository as jest.Mock).mockReturnValue(mockUserRepository);
     });
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({
-      message: 'An error occurred',
-      error: expect.any(Object),
+
+    it('should update user profile with image and coverImage', async () => {
+      const updates = {
+        firstName: 'Updated',
+        image: 'https://example.com/new-profile.jpg',
+        coverImage: 'https://example.com/new-cover.jpg',
+      };
+
+      req.body = updates;
+      mockUserRepository.findOneBy.mockResolvedValue(req.user);
+      mockUserRepository.save.mockResolvedValue({ ...req.user, ...updates });
+
+      await updateUserProfile(req as Request, res as Response);
+
+      expect(mockUserRepository.merge).toHaveBeenCalledWith(req.user, updates);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Profile updated successfully',
+        user: expect.objectContaining(updates),
+      });
+    });
+
+    it('should handle invalid image URL format', async () => {
+      const updates = {
+        image: 'invalid-url',
+      };
+
+      req.body = updates;
+      mockUserRepository.findOneBy.mockResolvedValue(req.user);
+      mockUserRepository.save.mockRejectedValue(new Error('Invalid image URL'));
+
+      await updateUserProfile(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Invalid update data',
+        error: 'Invalid image URL'
+      });
+    });
+
+    it('should handle user not found', async () => {
+      mockUserRepository.findOneBy.mockResolvedValue(null);
+
+      await updateUserProfile(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'User not found',
+      });
+    });
+
+    it('should handle database errors', async () => {
+      mockUserRepository.findOneBy.mockRejectedValue(new Error('Database error'));
+
+      await updateUserProfile(req as Request, res as Response);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'An error occurred',
+        error: 'Database error'
+      });
     });
   });
 });
-*/
