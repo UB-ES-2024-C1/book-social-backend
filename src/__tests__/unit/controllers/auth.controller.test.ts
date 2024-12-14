@@ -1,8 +1,4 @@
-import {
-  login,
-  register,
-  getMe,
-} from '../../../controllers/auth.controller';
+import { login, register, getMe } from '../../../controllers/auth.controller';
 import { User, UserRole } from '../../../entities/User';
 import { registerUser, loginUser } from '../../../services/auth.service';
 import { Request, Response } from 'express';
@@ -12,7 +8,6 @@ jest.mock('../../../services/auth.service', () => ({
   loginUser: jest.fn(),
   registerUser: jest.fn(),
 }));
-
 
 describe('Auth Controller - Login', () => {
   let req: Partial<Request>;

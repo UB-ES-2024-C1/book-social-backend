@@ -41,7 +41,9 @@ describe('Auth Routes', () => {
     it('should route to register controller', async () => {
       const mockRegisterController = register as jest.Mock;
       mockRegisterController.mockImplementation((req, res) => {
-        res.status(201).json({ message: 'User registered successfully', userId: 1 });
+        res
+          .status(201)
+          .json({ message: 'User registered successfully', userId: 1 });
       });
 
       await request(app)
@@ -52,7 +54,7 @@ describe('Auth Routes', () => {
           username: 'johndoe',
           email: 'john@example.com',
           password: 'Password123!',
-          genre: 'Fiction'
+          genre: 'Fiction',
         })
         .expect(201);
 
@@ -78,7 +80,7 @@ describe('Auth Routes', () => {
           favGenre: 'Fiction',
           image: '',
           coverImage: '',
-          posts: []
+          posts: [],
         });
       });
 
@@ -101,9 +103,9 @@ describe('Auth Routes', () => {
         .get('/auth/me')
         .expect(401)
         .expect('Content-Type', /json/)
-        .expect((res: { body: { message: string; }; }) => {
+        .expect((res: { body: { message: string } }) => {
           expect(res.body).toEqual({
-            message: 'Authentication token required'
+            message: 'Authentication token required',
           });
         });
     });
@@ -111,9 +113,7 @@ describe('Auth Routes', () => {
 
   describe('Invalid routes', () => {
     it('should return 404 for undefined auth routes', async () => {
-      await request(app)
-        .get('/auth/invalid-route')
-        .expect(404);
+      await request(app).get('/auth/invalid-route').expect(404);
     });
   });
 });
