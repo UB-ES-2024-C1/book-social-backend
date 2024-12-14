@@ -51,6 +51,7 @@ export const register = async (req: Request, res: Response) => {
       password,
       genre,
       description,
+      role,
     } = req.body;
 
     const validation = validateRegisterInput(
@@ -60,7 +61,8 @@ export const register = async (req: Request, res: Response) => {
       email,
       password,
       genre,
-      description
+      description,
+      role
     );
 
     if (!validation.isValid) {
@@ -78,7 +80,8 @@ export const register = async (req: Request, res: Response) => {
       email,
       password,
       genre,
-      description
+      description,
+      role
     );
 
     if (!result.user) {

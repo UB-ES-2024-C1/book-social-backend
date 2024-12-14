@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 import { Book } from './Book';
 import { Review } from './Review';
+import { Post } from './Post';
 
 /**
  * User entity class
@@ -125,4 +126,7 @@ export class User {
 
   @OneToMany(() => Review, (review) => review.user)
   reviews?: Review[];
+
+  @OneToMany(() => Post, (post) => post.author)
+  posts?: Post[];
 }
