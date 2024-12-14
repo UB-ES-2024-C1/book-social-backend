@@ -61,7 +61,7 @@ router.get('/top-rated', authenticateToken, getTopRatedBooksHandler);
 
 // Categorization routes
 router.get('/categories', authenticateToken, getAllCategoriesHandler);
-router.get('/genres', authenticateToken, getAllGenresHandler);
+router.get('/genres', getAllGenresHandler);
 router.get('/recent', authenticateToken, getRecentBooksHandler);
 
 // Statistics routes
