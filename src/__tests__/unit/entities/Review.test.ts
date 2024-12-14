@@ -17,6 +17,7 @@ describe('Review Entity', () => {
     user: User;
     book: Book;
     rating: number;
+    comment?: string;
   };
 
   beforeEach(() => {
@@ -47,6 +48,7 @@ describe('Review Entity', () => {
       user: mockUser,
       book: mockBook,
       rating: 4.5,
+      comment: 'This is a test comment',
     };
   });
 
@@ -174,6 +176,39 @@ describe('Review Entity', () => {
       expect(ratingErrors[0].constraints?.isNumber).toContain(
         'Rating must be a number'
       );
+    });
+
+    it('should validate a review with optional comment', async () => {
+      const review = new Review();
+      Object.assign(review, validReviewData);
+      review.created_at = new Date();
+
+      const errors = await validate(review);
+      expect(errors.length).toBe(0);
+    });
+
+    it('should validate a review without comment', async () => {
+      const review = new Review();
+      const { comment, ...reviewWithoutComment } = validReviewData;
+      Object.assign(review, reviewWithoutComment);
+      review.created_at = new Date();
+
+      const errors = await validate(review);
+      expect(errors.length).toBe(0);
+    });
+
+    it('should fail validation when comment is too long', async () => {
+      const review = new Review();
+      const longComment = 'a'.repeat(1001);
+      Object.assign(review, { ...validReviewData, comment: longComment });
+      review.created_at = new Date();
+
+      const errors = await validate(review);
+      const commentErrors = errors.filter(
+        (error) => error.property === 'comment'
+      );
+
+      expect(commentErrors.length).toBeGreaterThan(0);
     });
   });
 

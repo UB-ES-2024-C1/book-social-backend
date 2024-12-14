@@ -86,9 +86,10 @@ describe('Review Service', () => {
   describe('createReview', () => {
     it('should create a review successfully with valid data', async () => {
       const reviewData = {
-        user: mockUser,
-        book: mockBook,
+        userId: mockUser.id,
+        bookId: mockBook.id,
         rating: 4.5,
+        comment: 'Great book!',
       };
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
@@ -104,9 +105,10 @@ describe('Review Service', () => {
 
     it('should fail if user does not exist', async () => {
       const reviewData = {
-        user: { ...mockUser, id: 999 },
-        book: mockBook,
+        userId: 999,
+        bookId: mockBook.id,
         rating: 4.5,
+        comment: 'Great book!',
       };
 
       mockUserRepository.findOne.mockResolvedValue(null);
@@ -115,15 +117,16 @@ describe('Review Service', () => {
       const result = await createReview(reviewData);
 
       expect(result.review).toBeNull();
-      expect(result.error).toBe('User not found');
+      expect(result.error).toBe('User or Book not found');
       expect(mockReviewRepository.save).not.toHaveBeenCalled();
     });
 
     it('should fail if book does not exist', async () => {
       const reviewData = {
-        user: mockUser,
-        book: { ...mockBook, id: 999 },
+        userId: mockUser.id,
+        bookId: 999,
         rating: 4.5,
+        comment: 'Great book!',
       };
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
@@ -132,7 +135,7 @@ describe('Review Service', () => {
       const result = await createReview(reviewData);
 
       expect(result.review).toBeNull();
-      expect(result.error).toBe('Book not found');
+      expect(result.error).toBe('User or Book not found');
       expect(mockReviewRepository.save).not.toHaveBeenCalled();
     });
   });
