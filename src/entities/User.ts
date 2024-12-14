@@ -115,6 +115,12 @@ export class User {
   })
   role!: UserRole;
 
+  @Column({ nullable: true })
+  image?: string;
+
+  @Column({ nullable: true })
+  coverImage?: string;
+
   @OneToMany(() => Book, (book) => book.author)
   books?: Book[];
 
