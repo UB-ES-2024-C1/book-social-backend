@@ -1,6 +1,7 @@
 import { AppDataSource } from '../../../config/database';
 import { User, UserRole } from '../../../entities/User';
 import { Book } from '../../../entities/Book';
+import { Repository } from 'typeorm';
 import { toggleSavedBook, isBookSaved, getSavedBooks } from '../../../services/book.service';
 
 jest.mock('../../../config/database', () => ({
@@ -10,8 +11,14 @@ jest.mock('../../../config/database', () => ({
 }));
 
 describe('Saved Books Service', () => {
-  let mockUserRepository: any;
-  let mockBookRepository: any;
+  const mockUserRepository: jest.Mocked<Repository<User>> = {
+    findOne: jest.fn(),
+    save: jest.fn(),
+  } as unknown as jest.Mocked<Repository<User>>;
+
+  const mockBookRepository: jest.Mocked<Repository<Book>> = {
+    findOne: jest.fn(),
+  } as unknown as jest.Mocked<Repository<Book>>;
 
   const mockUser = {
     id: 1,
@@ -39,15 +46,6 @@ describe('Saved Books Service', () => {
   } as Book;
 
   beforeEach(() => {
-    mockUserRepository = {
-      findOne: jest.fn(),
-      save: jest.fn(),
-    };
-
-    mockBookRepository = {
-      findOne: jest.fn(),
-    };
-
     (AppDataSource.getRepository as jest.Mock).mockImplementation((entity) => {
       if (entity === User) return mockUserRepository;
       if (entity === Book) return mockBookRepository;

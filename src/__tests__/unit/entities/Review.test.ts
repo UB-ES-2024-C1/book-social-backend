@@ -189,7 +189,11 @@ describe('Review Entity', () => {
 
     it('should validate a review without comment', async () => {
       const review = new Review();
-      const { comment, ...reviewWithoutComment } = validReviewData;
+      const reviewWithoutComment = {
+        user: validReviewData.user,
+        book: validReviewData.book,
+        rating: validReviewData.rating
+      };
       Object.assign(review, reviewWithoutComment);
       review.created_at = new Date();
 
@@ -293,7 +297,11 @@ describe('Review Entity', () => {
 
     it('should validate a review without comment', async () => {
       const review = new Review();
-      const { comment, ...reviewWithoutComment } = validReviewData;
+      const reviewWithoutComment = {
+        user: validReviewData.user,
+        book: validReviewData.book,
+        rating: validReviewData.rating
+      };
       Object.assign(review, reviewWithoutComment);
       review.created_at = new Date();
 
