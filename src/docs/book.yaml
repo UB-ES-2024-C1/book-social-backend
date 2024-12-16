@@ -665,3 +665,81 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
+/books/saved-list:
+  get:
+    tags: [Books]
+    summary: Get user's saved books
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: List of saved books retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BookListDTO'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '500':
+        $ref: '#/components/responses/InternalError'
+
+/books/saved-list/{bookId}:
+  post:
+    tags: [Books]
+    summary: Add/remove book from saved list
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: bookId
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        description: Book saved/unsaved successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                isSaved:
+                  type: boolean
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalError'
+  
+  get:
+    tags: [Books]
+    summary: Check if book is in user's saved list
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: bookId
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        description: Book saved status retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isSaved:
+                  type: boolean
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '404':
+        $ref: '#/components/responses/NotFound'
+      '500':
+        $ref: '#/components/responses/InternalError'

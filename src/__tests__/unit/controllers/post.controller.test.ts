@@ -1,20 +1,20 @@
 import { Request, Response } from 'express';
 import {
   createPost,
-  getUserPosts,
   getAllPosts,
   getPostsByUserId,
 } from '../../../controllers/post.controller';
 import { AppDataSource } from '../../../config/database';
+import { User, UserRole } from '../../../entities/User';
 import { Post } from '../../../entities/Post';
-import { User } from '../../../entities/User';
+import { Repository } from 'typeorm';
 
 jest.mock('../../../config/database');
 
 describe('Post Controller', () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
-  let mockPostRepository: any;
+  let mockPostRepository: jest.Mocked<Repository<Post>>;
 
   beforeEach(() => {
     mockRequest = {
@@ -36,7 +36,7 @@ describe('Post Controller', () => {
     mockPostRepository = {
       save: jest.fn(),
       find: jest.fn(),
-    };
+    } as unknown as jest.Mocked<Repository<Post>>;
 
     (AppDataSource.getRepository as jest.Mock).mockReturnValue(
       mockPostRepository
@@ -65,6 +65,19 @@ describe('Post Controller', () => {
 
   describe('getAllPosts', () => {
     it('should return all posts with author information', async () => {
+      const mockAuthor = {
+        id: 1,
+        username: 'testuser',
+        firstName: 'Test',
+        lastName: 'User',
+        image: 'profile.jpg',
+        email: 'test@example.com',
+        password: 'password123',
+        genre: 'Fiction',
+        role: UserRole.READER,
+        savedBooks: [],
+      } as User;
+
       const mockPosts = [
         {
           id: 1,
@@ -73,14 +86,8 @@ describe('Post Controller', () => {
           imageUrls: ['https://example.com/image.jpg'],
           createdAt: new Date(),
           updatedAt: new Date(),
-          author: {
-            id: 1,
-            username: 'testuser',
-            firstName: 'Test',
-            lastName: 'User',
-            image: 'profile.jpg',
-          },
-        },
+          author: mockAuthor,
+        } as Post,
       ];
 
       mockPostRepository.find.mockResolvedValue(mockPosts);
@@ -107,6 +114,19 @@ describe('Post Controller', () => {
     it('should return posts for a specific user', async () => {
       mockRequest.params = { userId: '1' };
 
+      const mockAuthor = {
+        id: 1,
+        username: 'testuser',
+        firstName: 'Test',
+        lastName: 'User',
+        image: 'profile.jpg',
+        email: 'test@example.com',
+        password: 'password123',
+        genre: 'Fiction',
+        role: UserRole.READER,
+        savedBooks: [],
+      } as User;
+
       const mockUserPosts = [
         {
           id: 1,
@@ -115,14 +135,8 @@ describe('Post Controller', () => {
           imageUrls: ['https://example.com/image.jpg'],
           createdAt: new Date(),
           updatedAt: new Date(),
-          author: {
-            id: 1,
-            username: 'testuser',
-            firstName: 'Test',
-            lastName: 'User',
-            image: 'profile.jpg',
-          },
-        },
+          author: mockAuthor,
+        } as Post,
       ];
 
       mockPostRepository.find.mockResolvedValue(mockUserPosts);

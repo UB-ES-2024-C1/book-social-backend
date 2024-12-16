@@ -290,7 +290,11 @@ describe('Auth Controller', () => {
   });
 
   describe('updateUserProfile', () => {
-    let mockUserRepository: any;
+    let mockUserRepository: {
+      findOneBy: jest.Mock;
+      merge: jest.Mock;
+      save: jest.Mock;
+    };
 
     beforeEach(() => {
       mockUserRepository = {

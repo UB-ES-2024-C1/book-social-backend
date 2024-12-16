@@ -49,7 +49,7 @@ export const createReview = async (reviewData: {
 
     const savedReview = await reviewRepository.save(review);
     return { review: savedReview };
-  } catch (error) {
+  } catch (_error) {
     return { review: null, error: 'Error creating review' };
   }
 };

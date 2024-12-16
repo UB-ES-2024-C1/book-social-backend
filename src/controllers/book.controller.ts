@@ -15,6 +15,9 @@ import {
   getAllGenres,
   getRecentBooks,
   getBookStats,
+  toggleSavedBook,
+  isBookSaved,
+  getSavedBooks,
 } from '../services/book.service';
 
 /**
@@ -393,5 +396,86 @@ export const getBookStatsHandler = async (req: Request, res: Response) => {
     res.status(200).json(stats);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching book statistics', error });
+  }
+};
+// Add to src/controllers/book.controller.ts
+
+/**
+ * Toggles a book's saved status for the current user
+ */
+export const toggleSavedBookHandler = async (req: Request, res: Response) => {
+  try {
+    const bookId = parseInt(req.params.bookId);
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
+    }
+
+    const { isSaved, error } = await toggleSavedBook(userId, bookId);
+
+    if (error) {
+      res.status(404).json({ message: error });
+      return;
+    }
+
+    res.status(200).json({
+      message: isSaved ? 'Book saved successfully' : 'Book removed from saved list',
+      isSaved
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error toggling saved book', error });
+  }
+};
+
+/**
+ * Checks if a book is saved by the current user
+ */
+export const isBookSavedHandler = async (req: Request, res: Response) => {
+  try {
+    const bookId = parseInt(req.params.bookId);
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
+    }
+
+    const { isSaved, error } = await isBookSaved(userId, bookId);
+
+    if (error) {
+      res.status(404).json({ message: error });
+      return;
+    }
+
+    res.status(200).json({ isSaved });
+  } catch (error) {
+    res.status(500).json({ message: 'Error checking saved book', error });
+  }
+};
+
+/**
+ * Gets all books saved by the current user
+ */
+export const getSavedBooksHandler = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
+    }
+
+    const { books, error } = await getSavedBooks(userId);
+
+    if (error) {
+      res.status(404).json({ message: error });
+      return;
+    }
+
+    res.status(200).json(books);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching saved books', error });
   }
 };
