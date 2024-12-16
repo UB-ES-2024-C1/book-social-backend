@@ -46,15 +46,6 @@ export const validateBookInput = (
     }
   }
 
-  // Validar URL
-  if (bookData.image_url) {
-    try {
-      new URL(bookData.image_url);
-    } catch {
-      errors.push('Image URL must be a valid URL');
-    }
-  }
-
   // Validar números
   if (bookData.num_pages !== undefined && bookData.num_pages < 1) {
     errors.push('Number of pages must be at least 1');

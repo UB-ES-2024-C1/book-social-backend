@@ -33,7 +33,6 @@ export class Post {
 
   @Column('simple-array', { nullable: true })
   @IsOptional()
-  @IsUrl({}, { each: true })
   @ArrayMaxSize(4)
   imageUrls?: string[];
 
