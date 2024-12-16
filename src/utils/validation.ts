@@ -1,3 +1,5 @@
+import { UserRole } from '../entities/User';
+
 /**
  * Validates the input for login.
  * @param {string} email - The email to be validated.
@@ -46,6 +48,7 @@ export const validateRegisterInput = (
   email: string,
   password: string,
   genre: string,
+  role?: string,
   description?: string
 ): {
   isValid: boolean;
@@ -88,6 +91,14 @@ export const validateRegisterInput = (
 
   if (emailError) errors.push(emailError);
   if (passwordError) errors.push(passwordError);
+
+  if (
+    role !== undefined &&
+    role !== UserRole.READER &&
+    role !== UserRole.WRITER
+  ) {
+    errors.push('Invalid role');
+  }
 
   return {
     isValid: errors.length === 0,

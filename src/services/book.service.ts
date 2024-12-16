@@ -534,7 +534,7 @@ export const getBookReviews = async (
 ): Promise<{ reviews: Review[]; total: number; error?: string }> => {
   try {
     const reviewRepository = AppDataSource.getRepository(Review);
-    
+
     const [reviews, total] = await reviewRepository.findAndCount({
       where: { book: { id: bookId } },
       relations: ['user'],
@@ -545,12 +545,12 @@ export const getBookReviews = async (
         user: {
           id: true,
           firstName: true,
-          lastName: true
-        }
+          lastName: true,
+        },
       },
       order: { created_at: 'DESC' },
       skip: (page - 1) * limit,
-      take: limit
+      take: limit,
     });
 
     return { reviews, total };
@@ -749,5 +749,115 @@ export const getBookStats = async (): Promise<{
   } catch (error) {
     console.error('Error fetching book statistics:', error);
     return { stats: null, error: 'Error fetching book statistics' };
+  }
+};
+
+/**
+ * Toggles a book's saved status for a user
+ */
+export const toggleSavedBook = async (
+  userId: number,
+  bookId: number
+): Promise<{ isSaved: boolean; error?: string }> => {
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+    const bookRepository = AppDataSource.getRepository(Book);
+    
+    const user = await userRepository.findOne({
+      where: { id: userId },
+      relations: ['savedBooks']
+    });
+
+    if (!user) {
+      return { isSaved: false, error: 'User not found' };
+    }
+
+    const book = await bookRepository.findOne({
+      where: { id: bookId }
+    });
+
+    if (!book) {
+      return { isSaved: false, error: 'Book not found' };
+    }
+
+    const savedBookIndex = user.savedBooks.findIndex(b => b.id === bookId);
+    if (savedBookIndex === -1) {
+      user.savedBooks.push(book);
+    } else {
+      user.savedBooks.splice(savedBookIndex, 1);
+    }
+
+    await userRepository.save(user);
+    return { isSaved: savedBookIndex === -1 };
+  } catch (error) {
+    console.error('Error toggling saved book:', error);
+    return { isSaved: false, error: 'Error toggling saved book' };
+  }
+};
+
+/**
+ * Checks if a book is saved by a user
+ */
+export const isBookSaved = async (
+  userId: number,
+  bookId: number
+): Promise<{ isSaved: boolean; error?: string }> => {
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({
+      where: { id: userId },
+      relations: ['savedBooks']
+    });
+
+    if (!user) {
+      return { isSaved: false, error: 'User not found' };
+    }
+
+    const isSaved = user.savedBooks.some(book => book.id === bookId);
+    return { isSaved };
+  } catch (error) {
+    console.error('Error checking saved book:', error);
+    return { isSaved: false, error: 'Error checking saved book' };
+  }
+};
+
+/**
+ * Gets all books saved by a user
+ */
+export const getSavedBooks = async (
+  userId: number
+): Promise<{ books: BookListDTO[]; error?: string }> => {
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({
+      where: { id: userId },
+      relations: ['savedBooks', 'savedBooks.author']
+    });
+
+    if (!user) {
+      return { books: [], error: 'User not found' };
+    }
+
+    const books = user.savedBooks.map(book => ({
+      id: book.id,
+      title: book.title,
+      genres: book.genres,
+      author: {
+        firstName: book.author.firstName,
+        lastName: book.author.lastName
+      },
+      shortSynopsis: book.synopsis 
+        ? book.synopsis.length > 100 
+          ? `${book.synopsis.substring(0, 100)}...`
+          : book.synopsis
+        : null,
+      reviewValue: book.reviewValue ?? null,
+      image_url: book.image_url
+    }));
+
+    return { books };
+  } catch (error) {
+    console.error('Error fetching saved books:', error);
+    return { books: [], error: 'Error fetching saved books' };
   }
 };

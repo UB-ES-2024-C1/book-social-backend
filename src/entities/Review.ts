@@ -6,7 +6,16 @@ import {
   ManyToOne,
   CreateDateColumn,
 } from 'typeorm';
-import { IsNotEmpty, IsNumber, Min, Max, IsDate } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  Min,
+  Max,
+  IsOptional,
+  IsDate,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { User } from './User';
 import { Book } from './Book';
 
@@ -18,11 +27,11 @@ export class Review {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => User, (user) => user.reviews)
+  @ManyToOne(() => User, { nullable: false })
   @IsNotEmpty({ message: 'User is required' })
   user!: User;
 
-  @ManyToOne(() => Book, (book) => book.reviews)
+  @ManyToOne(() => Book, { nullable: false })
   @IsNotEmpty({ message: 'Book is required' })
   book!: Book;
 
@@ -33,7 +42,12 @@ export class Review {
   @Max(5, { message: 'Rating must be at most 5' })
   rating!: number;
 
-  @Column()
+  @Column('text', { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000, { message: 'Comment must be shorter than 1000 characters' })
+  comment?: string;
+
   @CreateDateColumn()
   @IsDate({ message: 'Created date must be a valid date' })
   created_at!: Date;

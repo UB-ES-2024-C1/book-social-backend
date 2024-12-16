@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import {
   IsEmail,
   Length,
@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 import { Book } from './Book';
 import { Review } from './Review';
+import { Post } from './Post';
 
 /**
  * User entity class
@@ -113,10 +114,28 @@ export class User {
     message: 'Invalid role. Must be either reader or writer',
   })
   role!: UserRole;
+// Add to src/entities/User.ts in the User class
+
+  @ManyToMany(() => Book)
+  @JoinTable({
+    name: 'user_saved_books',
+    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'book_id', referencedColumnName: 'id' }
+  })
+  savedBooks!: Book[];
+  
+  @Column({ nullable: true })
+  image?: string;
+
+  @Column({ nullable: true })
+  coverImage?: string;
 
   @OneToMany(() => Book, (book) => book.author)
   books?: Book[];
 
   @OneToMany(() => Review, (review) => review.user)
   reviews?: Review[];
+
+  @OneToMany(() => Post, (post) => post.author)
+  posts?: Post[];
 }

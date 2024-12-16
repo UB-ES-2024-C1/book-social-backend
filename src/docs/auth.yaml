@@ -209,7 +209,14 @@ paths:
                   exemple: Fiction
                 description:
                   type: string
-
+                image:
+                  type: string
+                  description: User's profile image URL (empty for now)
+                  example: ''
+                coverImage:
+                  type: string
+                  description: User's cover image URL (empty for now)
+                  example: ''
               required:
                 - firstName
                 - lastName
