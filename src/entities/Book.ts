@@ -64,7 +64,6 @@ export class Book {
   synopsis?: string;
 
   @Column({ nullable: true })
-  @IsUrl({}, { message: 'Image URL must be a valid URL' })
   image_url?: string;
 
   @Column({ nullable: true })

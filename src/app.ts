@@ -6,6 +6,7 @@ import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger';
 import bookRoutes from './routes/book.routes';
 import reviewRoutes from './routes/reviews.routes';
+import postRoutes from './routes/post.routes';
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/books', bookRoutes);
 app.use('/reviews', reviewRoutes);
+app.use('/posts', postRoutes);
 
 // TODO: Error handling middleware
 // app.use(futureErrorHandler)
