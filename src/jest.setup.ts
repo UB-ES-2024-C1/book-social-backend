@@ -20,6 +20,7 @@ jest.mock('class-validator', () => ({
   ArrayMaxSize: () => jest.fn(),
   ArrayNotEmpty: () => jest.fn(),
   IsOptional: () => jest.fn(),
+  IsString: () => jest.fn(),
   validate: jest.fn().mockResolvedValue([]),
 }));
 

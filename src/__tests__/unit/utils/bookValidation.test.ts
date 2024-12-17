@@ -16,6 +16,7 @@ describe('Book Validation', () => {
     description: 'A test author',
     role: UserRole.WRITER,
     books: [],
+    savedBooks: [],
   } as User;
 
   // Valid book data para reutilizar

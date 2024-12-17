@@ -51,6 +51,7 @@ export const register = async (req: Request, res: Response) => {
       password,
       genre,
       description,
+      role,
     } = req.body;
 
     const validation = validateRegisterInput(
@@ -60,7 +61,8 @@ export const register = async (req: Request, res: Response) => {
       email,
       password,
       genre,
-      description
+      description,
+      role
     );
 
     if (!validation.isValid) {
@@ -78,7 +80,8 @@ export const register = async (req: Request, res: Response) => {
       email,
       password,
       genre,
-      description
+      description,
+      role
     );
 
     if (!result.user) {
@@ -119,6 +122,8 @@ export const getMe = async (req: Request, res: Response) => {
         username,
         role,
         genre: favGenre,
+        image,
+        coverImage,
       } = req.user;
 
       userData = {
@@ -130,8 +135,8 @@ export const getMe = async (req: Request, res: Response) => {
         username,
         role: role.toLowerCase(),
         favGenre,
-        image: '',
-        coverImage: '',
+        image: image || '',
+        coverImage: coverImage || '',
         posts: [],
       };
     } catch {
@@ -153,13 +158,11 @@ export const updateUserProfile = async (req: Request, res: Response) => {
       res.status(401).json({ message: 'Not authenticated' });
       return;
     }
-    const userId = req.user.id; // Assuming user ID is passed as a route parameter
-    const updates = req.body; // The fields to update are sent in the request body
+    const userId = req.user.id;
+    const updates = req.body;
 
-    // Get the user repository
     const userRepository = AppDataSource.getRepository(User);
 
-    // Find the user by ID
     const user = await userRepository.findOneBy({ id: userId });
 
     if (!user) {
@@ -167,18 +170,27 @@ export const updateUserProfile = async (req: Request, res: Response) => {
       return;
     }
 
-    // Merge updates with the existing user object
-    userRepository.merge(user, updates);
+    try {
+      userRepository.merge(user, updates);
+      const updatedUser = await userRepository.save(user);
 
-    // Validate and save the updated user
-    const updatedUser = await userRepository.save(user);
-
-    res.status(200).json({
-      message: 'Profile updated successfully',
-      user: updatedUser,
-    });
+      res.status(200).json({
+        message: 'Profile updated successfully',
+        user: updatedUser,
+      });
+    } catch (error) {
+      res.status(400).json({ 
+        message: 'Invalid update data',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'An error occurred', error });
+    if (process.env.NODE_ENV !== 'test') {
+      console.error(error);
+    }
+    res.status(500).json({ 
+      message: 'An error occurred', 
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 };

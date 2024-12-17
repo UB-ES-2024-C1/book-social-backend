@@ -15,6 +15,9 @@ import {
   getAllGenresHandler,
   getRecentBooksHandler,
   getBookStatsHandler,
+  getSavedBooksHandler,
+  toggleSavedBookHandler,
+  isBookSavedHandler,
 } from '../controllers/book.controller';
 import {
   authenticateToken,
@@ -61,10 +64,13 @@ router.get('/top-rated', authenticateToken, getTopRatedBooksHandler);
 
 // Categorization routes
 router.get('/categories', authenticateToken, getAllCategoriesHandler);
-router.get('/genres', authenticateToken, getAllGenresHandler);
+router.get('/genres', getAllGenresHandler);
 router.get('/recent', authenticateToken, getRecentBooksHandler);
 
-// Statistics routes
 router.get('/stats', authenticateToken, getBookStatsHandler);
+
+router.get('/saved-list', authenticateToken, getSavedBooksHandler);
+router.post('/saved-list/:bookId', authenticateToken, toggleSavedBookHandler);
+router.get('/saved-list/:bookId', authenticateToken, isBookSavedHandler);
 
 export default router;
