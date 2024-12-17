@@ -38,6 +38,7 @@ export const createReview = async (reviewData: {
     review.book = book;
     review.rating = reviewData.rating;
     review.comment = reviewData.comment;
+    review.created_at = new Date();
 
     const errors = await validate(review);
     if (errors.length > 0) {

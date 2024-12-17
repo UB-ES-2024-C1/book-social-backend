@@ -259,8 +259,9 @@ export const getBooksList = async (
     if (orderByDate) {
       query.orderBy('book.publication_date', 'ASC');
     }
-
-    query.take(limit || 10);
+    if (limit) {
+      query.take(limit);
+    }
 
     const books = await query.getMany();
 
