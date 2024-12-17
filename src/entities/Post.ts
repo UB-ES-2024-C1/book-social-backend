@@ -11,7 +11,6 @@ import {
   IsString,
   MaxLength,
   ArrayMaxSize,
-  IsUrl,
 } from 'class-validator';
 import { User } from './User';
 
@@ -33,7 +32,6 @@ export class Post {
 
   @Column('simple-array', { nullable: true })
   @IsOptional()
-  @IsUrl({}, { each: true })
   @ArrayMaxSize(4)
   imageUrls?: string[];
 
