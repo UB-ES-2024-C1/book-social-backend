@@ -11,7 +11,6 @@ import {
   IsString,
   MaxLength,
   ArrayMaxSize,
-  IsUrl,
 } from 'class-validator';
 import { User } from './User';
 
