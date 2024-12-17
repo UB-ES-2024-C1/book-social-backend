@@ -9,7 +9,6 @@ import {
 import {
   Length,
   IsNotEmpty,
-  IsUrl,
   IsDate,
   IsInt,
   Min,
